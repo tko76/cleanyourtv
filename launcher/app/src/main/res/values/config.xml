@@ -18,7 +18,11 @@
     <!-- Apps pinned to the dock row at the bottom, in this order. Missing apps are skipped. -->
     <!-- Sony BRAVIA 4K VH2 (UC / North America): edit this list to add your apps. -->
     <string-array name="dock_apps">
-        <item>com.android.tv.settings</item>
+        <item>com.player.janky</item>
+        <item>com.nuvio.app</item>
+        <item>org.smarttube.stable</item>
+        <item>com.esaba.downloader</item>
+        <item>com.android.vending</item>
     </string-array>
     <!-- With fewer dock_apps than columns (or a dock app that is not installed), the free dock slots take
          the first grid apps, so the dock never shows a gap. false leaves them empty (#162); a theme can
