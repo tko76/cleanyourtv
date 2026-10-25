@@ -19,7 +19,7 @@
     <!-- Sony BRAVIA 4K VH2 (UC / North America): edit this list to add your apps. -->
     <string-array name="dock_apps">
         <item>com.player.janky</item>
-        <item>com.nuvio.app</item>
+        <item>com.nuvio.tv</item>
         <item>org.smarttube.stable</item>
         <item>com.esaba.downloader</item>
         <item>com.android.vending</item>
