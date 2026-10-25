@@ -15,14 +15,26 @@ android {
         versionName '3.0'
     }
 
+    def ksFile = System.getenv('KEYSTORE_PATH') ? file(System.getenv('KEYSTORE_PATH')) : null
+    if (ksFile?.exists()) {
+        signingConfigs {
+            release {
+                storeFile ksFile
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
         release {
             // R8 strips and optimises the code (AndroidX included): smaller APK, faster start on a slow TV CPU.
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Sideloaded over ADB, never published: sign with the debug key so it installs over a debug build.
-            signingConfig signingConfigs.debug
+            // Use stable keystore when available (CI), otherwise fall back to debug key.
+            signingConfig (ksFile?.exists()) ? signingConfigs.release : signingConfigs.debug
         }
     }
 
