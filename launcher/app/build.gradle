@@ -16,7 +16,8 @@ android {
     }
 
     def ksFile = System.getenv('KEYSTORE_PATH') ? file(System.getenv('KEYSTORE_PATH')) : null
-    if (ksFile?.exists()) {
+    def useStableKey = ksFile?.exists()
+    if (useStableKey) {
         signingConfigs {
             release {
                 storeFile ksFile
@@ -34,7 +35,11 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // Use stable keystore when available (CI), otherwise fall back to debug key.
-            signingConfig (ksFile?.exists()) ? signingConfigs.release : signingConfigs.debug
+            if (useStableKey) {
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
+            }
         }
     }
 
