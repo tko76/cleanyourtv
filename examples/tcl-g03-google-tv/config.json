@@ -5,6 +5,7 @@
     4077
   ],
   "settings_key_panel": true,
+  "date_below_clock": true,
   "right_bar_apps": ["io.github.tko76.restarttv"],
   "app_keys": [
     "KEYCODE_TCL_NETFLIX:com.netflix.ninja",
