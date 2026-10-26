@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 /**
  * Shows a "Restart now?" confirmation dialog over the launcher. D-pad navigable because it is
@@ -39,10 +41,10 @@ public class RestartActivity extends Activity {
             reboot.setComponent(new ComponentName(SETTINGS_PKG, REBOOT_RECEIVER));
             reboot.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
             sendBroadcast(reboot);
-        } catch (SecurityException ignored) {
-            openSystemSettings();
-        }
-        finish();
+        } catch (Exception ignored) { }
+        // If the TV reboots the handler never fires. If the receiver ignores us (app lacks
+        // privilege), open Settings → System after 2 s so the user can press Restart there.
+        new Handler(Looper.getMainLooper()).postDelayed(this::openSystemSettings, 2000);
     }
 
     private void openSystemSettings() {
@@ -53,9 +55,10 @@ public class RestartActivity extends Activity {
         deep.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         try {
             startActivity(deep);
-            return;
-        } catch (Exception ignored) { }
-        startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        } catch (Exception ignored) {
+            startActivity(new Intent(android.provider.Settings.ACTION_SETTINGS)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
+        finish();
     }
 }
