@@ -1,0 +1,12 @@
+# Batch 1: Telemetry and tracking only
+tv.samba.ssm
+tv.samba.ssm.ui
+com.qterics.da.product
+com.sony.dtv.da.service
+com.sonyericsson.idd.agent
+com.sony.dtv.sonybugreportsys
+com.sony.dtv.sonyloglevelsettingsys
+com.sony.dtv.seeds.iot
+com.sony.dtv.seeds.iot.remotestart
+com.sony.dtv.seeds.auth
+com.google.android.feedback

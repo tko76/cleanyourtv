@@ -1,0 +1,6 @@
+# Batch 4: Launcher handover
+# TV is on wired Ethernet so FORCE_SETUPWRAITH=1 is safe (no Wi-Fi network to lose)
+# disable.sh's Home guard allows launcherx to be disabled because com.gathin.tvhome already claims HOME
+com.google.android.tungsten.setupwraith
+com.google.android.apps.tv.launcherx
+com.sony.dtv.launcherxcustomizer

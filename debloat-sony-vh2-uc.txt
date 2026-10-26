@@ -1,0 +1,87 @@
+# Sony BRAVIA 4K VH2 (BRAVIA_VH2_M_UC, North America), Android 12 / Google TV API 31
+# Apply:  TV_HOST=10.44.0.96 tools/disable.sh debloat-sony-vh2-uc.txt
+# Undo:   TV_HOST=10.44.0.96 tools/restore.sh debloat-sony-vh2-uc.txt com.google.android.apps.tv.launcherx
+#
+# UC (North American) notes:
+#  - promos, sonyselect, seeds.iot, seeds.iot.remotestart ship ENABLED (unlike EU)
+#  - launcherx priority=2 outranks cmd set-home-activity; must be disabled after new launcher is installed
+#  - Input, gear and Settings buttons answered by Sony firmware with launcherx disabled (tested, no key helper needed)
+#  - setupwraith: TV is on wired Ethernet so Wi-Fi check is moot; FORCE_SETUPWRAITH=1 used
+# Owner keeps: Google Assistant, AirPlay (com.sony.dtv.airplayapp), firmware updates
+# Owner wants removed/disabled: all preloaded streaming apps, Sony content rows, telemetry
+
+# === ACR viewing tracker ===
+tv.samba.ssm                               # Samba TV fingerprints every pixel on screen (priv-app!)
+tv.samba.ssm.ui
+
+# === telemetry, diagnostics, remote support ===
+com.qterics.da.product                     # Qterics device agent
+com.sony.dtv.da.service                    # Sony device agent service
+com.sonyericsson.idd.agent                 # Sony IDD diagnostic/telemetry
+com.sony.dtv.sonybugreportsys              # Sony bug reporting
+com.sony.dtv.sonyloglevelsettingsys        # Sony log-level control
+com.sony.dtv.seeds.iot                     # Sony SEEDS IoT analytics
+com.sony.dtv.seeds.iot.remotestart         # Sony SEEDS remote start
+com.sony.dtv.seeds.auth                    # Sony SEEDS auth token
+com.google.android.feedback                # Google crash reporting
+
+# === demo / retail shop mode ===
+com.sony.dtv.demosupport
+com.sony.dtv.demosystemsupport
+com.sony.dtv.multiscreendemo
+
+# === Sony promo and content rows ===
+com.sony.dtv.promos                        # "Freeplay" / promotions tile
+com.sony.dtv.sonyselect                    # Sony Select content row
+com.sony.dtv.sonytab                       # Sony tab row on the Google TV home
+com.sony.dtv.launcherxcustomizer           # Sony add-on that injects content into launcherx (disabled with it)
+com.sony.dtv.smartmediaapp                 # Sony smart media / content app
+com.sony.dtv.osat.music                    # Sony music player (USB); re-enable to play music from USB
+
+# === hotel / B2B features ===
+com.sony.dtv.b2b.hotelmode
+com.sony.dtv.b2b.adminpassword
+com.sony.dtv.b2b.deviceadminsettings
+com.sony.dtv.b2b.importexport
+com.sony.dtv.b2b.prosettings
+com.sony.dtv.b2b.rs232csupport
+
+# === BRAVIA CAM (user has no camera) ===
+com.sony.dtv.sensingcamera.fwupdate
+com.sony.dtv.sensingcamera.settings
+com.sony.dtv.sensingfusionservice
+com.sony.dtv.gestureapp
+com.sony.dtv.livingfit
+com.sony.dtv.distancealert
+
+# === preloaded streaming apps (user wants disabled/removed) ===
+com.amazon.amazonvideo.livingroom
+com.apple.atve.sony.appletv
+com.disney.disneyplus
+com.netflix.ninja
+com.netflix.partner.ncm
+com.sonypicturescore                       # factory-disabled on EU, enabled on UC
+com.google.android.youtube.tvmusic         # YouTube Music (separate from YouTube)
+com.google.android.play.games             # Google Play Games
+
+# === customer support / help ===
+com.sony.dtv.customersupport
+com.sony.dtv.customersupport.provider.res
+com.sony.dtv.smarthelp
+com.sony.dtv.helpguidecontents
+
+# === DLNA home media server (user doesn't use) ===
+com.sonyericsson.dlna
+com.sony.huey.dlna.module
+com.sony.huey.dlna.renderersettings
+com.sony.dtv.homenetwork
+
+# === Google TV setup wizard: claims HOME if stock launcher is disabled ===
+# TV is on Ethernet so FORCE_SETUPWRAITH=1 is safe (no Wi-Fi network to lose)
+com.google.android.tungsten.setupwraith
+
+# === Stock Google TV launcher ===
+# UC firmware: launcherx priority=2 outranks set-home-activity, so it must be disabled
+# after the new launcher is installed and claiming HOME. disable.sh's Home guard handles this:
+# it refuses to disable launcherx unless another launcher already answers HOME.
+com.google.android.apps.tv.launcherx

@@ -1,0 +1,20 @@
+# TCL G03 - Batch 3: Background services, streaming apps, voice/casting
+# Background services
+com.tcl.guard
+com.tcl.usercenter
+com.tcl.android.webview
+org.chromium.webview_shell
+com.google.android.syncadapters.calendar
+com.google.android.play.games
+com.tcl.gallery
+# Streaming apps (all disabled per user request)
+com.netflix.ninja
+com.amazon.amazonvideo.livingroom
+com.google.android.youtube.tvmusic
+com.google.android.videos
+com.tcl.ui_mediaCenter
+com.tcl.channelplus
+# Voice/casting (Alexa and Chromecast disabled; Assistant kept)
+com.tcl.assistant
+com.tcl.smartalexa
+com.google.android.apps.mediashell
