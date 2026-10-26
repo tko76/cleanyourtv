@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Restart</string>
+    <string name="service_label">Restart TV (power dialog)</string>
+    <string name="service_description">Shows the system Restart / Cancel dialog. It reads no screen content and intercepts no key presses.</string>
+</resources>
