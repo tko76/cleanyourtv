@@ -314,6 +314,10 @@
          They leave the grid. Missing apps are skipped. Can also be set with "top_bar_apps" in a theme. -->
     <string-array name="top_bar_apps" translatable="false">
     </string-array>
+    <!-- Apps shown as round buttons with their own logo in the top bar, right of the Settings pill, in this order.
+         They leave the grid. Missing apps are skipped. Can also be set with "right_bar_apps" in a theme. -->
+    <string-array name="right_bar_apps" translatable="false">
+    </string-array>
     <!-- The Inputs pill in the top bar, shown when the TV has inputs to list. false hides it for good; what the
          remote's Input button does is unchanged. Can also be set with "show_inputs_pill" in a theme. -->
     <bool name="show_inputs_pill">true</bool>

@@ -731,7 +731,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             libraryFromTopBar = true;   // closing it goes back to this button, not to the pill after the last row
         });
         btnLibraryTop.setVisibility(cfg.libraryButton && cfg.appLibrary ? View.VISIBLE : View.GONE);
-        addTopBarApps(cfg.topBarApps, cfg.launchActions);
+        addTopBarApps(cfg.topBarApps, cfg.launchActions, false);
+        addTopBarApps(cfg.rightBarApps, cfg.launchActions, true);
         iconOnlyButtons = cfg.iconOnlyButtons;
         topMenu = cfg.topMenu;
         wifiIconOnly = iconOnlyButtons && cfg.wifiLabelWidth <= 0;
@@ -2320,10 +2321,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private final List<View> topAppButtons = new ArrayList<>();
 
     /**
-     * Puts each top_bar_apps app in the top bar as a round pill with the app's own logo, left of the network pill.
-     * The logo keeps its colours: the pill style's tint, which turns the other icons white, is cleared.
+     * Puts each app in the top bar as a round pill with the app's own logo.
+     * appendToEnd=false: left of the network pill (top_bar_apps).
+     * appendToEnd=true: right of the Settings pill (right_bar_apps).
      */
-    private void addTopBarApps(List<String> packages, Map<String, String> launchActions) {
+    private void addTopBarApps(List<String> packages, Map<String, String> launchActions, boolean appendToEnd) {
         ViewGroup bar = findViewById(R.id.topButtons);
         PackageManager pm = getPackageManager();
         int size = Math.round(22 * density);
@@ -2354,8 +2356,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             button.setContentDescription(label);
             Intent target = launch;
             button.setOnClickListener(v -> open(new Intent(target)));
-            // After the network pill and the VPN pill; the Hebrew bar runs the other way, so before both there.
-            bar.addView(button, bar.indexOfChild(getResources().getBoolean(R.bool.rtl_menu_bar) ? btnVpn : btnWifi));
+            // appendToEnd=false: insert before the network pill (left side).
+            // appendToEnd=true: append after all existing children (right of Settings).
+            if (appendToEnd) {
+                bar.addView(button);
+            } else {
+                bar.addView(button, bar.indexOfChild(getResources().getBoolean(R.bool.rtl_menu_bar) ? btnVpn : btnWifi));
+            }
             topAppButtons.add(button);
         }
     }
