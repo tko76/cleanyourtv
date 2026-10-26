@@ -731,8 +731,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             libraryFromTopBar = true;   // closing it goes back to this button, not to the pill after the last row
         });
         btnLibraryTop.setVisibility(cfg.libraryButton && cfg.appLibrary ? View.VISIBLE : View.GONE);
-        addTopBarApps(cfg.topBarApps, cfg.launchActions, false);
-        addTopBarApps(cfg.rightBarApps, cfg.launchActions, true);
+        addTopBarApps(cfg.topBarApps, cfg.launchActions);
         iconOnlyButtons = cfg.iconOnlyButtons;
         topMenu = cfg.topMenu;
         wifiIconOnly = iconOnlyButtons && cfg.wifiLabelWidth <= 0;
@@ -786,12 +785,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             }
             int firstButton = btnInputs.getVisibility() == View.VISIBLE ? R.id.btnInputs : firstTopButton().getId();
             int leftButton = rtlMenuBar ? R.id.btnSettings : firstButton;
-            // If right_bar_apps buttons are present, the last visible one is the right end of the bar.
-            View lastRight = null;
-            for (int i = rightBarButtons.size() - 1; i >= 0; i--) {
-                if (rightBarButtons.get(i).getVisibility() == View.VISIBLE) { lastRight = rightBarButtons.get(i); break; }
-            }
-            int rightButton = rtlMenuBar ? firstButton : (lastRight != null ? lastRight.getId() : R.id.btnSettings);
+            int rightButton = rtlMenuBar ? firstButton : R.id.btnSettings;
             if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return v.getId() == leftButton;
             return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
         };
@@ -2324,14 +2318,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     /** top_bar_apps buttons, in bar order. */
     private final List<View> topAppButtons = new ArrayList<>();
-    private final List<View> rightBarButtons = new ArrayList<>();
 
     /**
-     * Puts each app in the top bar as a round pill with the app's own logo.
-     * appendToEnd=false: left of the network pill (top_bar_apps).
-     * appendToEnd=true: right of the Settings pill (right_bar_apps).
+     * Puts each top_bar_apps app in the top bar as a round pill with the app's own logo, left of the network pill.
+     * The logo keeps its colours: the pill style's tint, which turns the other icons white, is cleared.
      */
-    private void addTopBarApps(List<String> packages, Map<String, String> launchActions, boolean appendToEnd) {
+    private void addTopBarApps(List<String> packages, Map<String, String> launchActions) {
         ViewGroup bar = findViewById(R.id.topButtons);
         PackageManager pm = getPackageManager();
         int size = Math.round(22 * density);
@@ -2362,14 +2354,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             button.setContentDescription(label);
             Intent target = launch;
             button.setOnClickListener(v -> open(new Intent(target)));
-            // appendToEnd=false: insert before the network pill (left side).
-            // appendToEnd=true: append after all existing children (right of Settings).
-            if (appendToEnd) {
-                bar.addView(button);
-                rightBarButtons.add(button);
-            } else {
-                bar.addView(button, bar.indexOfChild(getResources().getBoolean(R.bool.rtl_menu_bar) ? btnVpn : btnWifi));
-            }
+            // After the network pill and the VPN pill; the Hebrew bar runs the other way, so before both there.
+            bar.addView(button, bar.indexOfChild(getResources().getBoolean(R.bool.rtl_menu_bar) ? btnVpn : btnWifi));
             topAppButtons.add(button);
         }
     }

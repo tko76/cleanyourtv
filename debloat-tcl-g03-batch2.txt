@@ -1,0 +1,9 @@
+# TCL G03 - Batch 2: Content rows, ads, partner installs
+com.tcl.dashboard
+com.tcl.partnercustomizer
+com.tcl.messagebox
+com.tcl.esticker
+com.tcl.waterfall.overseas
+android.autoinstalls.config.google.gtvpai
+com.google.android.partnersetup
+com.google.android.onetimeinitializer

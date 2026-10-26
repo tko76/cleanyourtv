@@ -5,6 +5,5 @@
   "dock_opacity": 70,
   "app_glow": true,
   "focus_overshoot": false,
-  "date_below_clock": true,
-  "right_bar_apps": ["io.github.tko76.restarttv"]
+  "date_below_clock": true
 }

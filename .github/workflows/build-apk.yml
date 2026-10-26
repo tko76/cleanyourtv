@@ -45,9 +45,3 @@ jobs:
           name: launcher-release
           path: launcher/app/build/outputs/apk/release/app-release.apk
           retention-days: 7
-      - name: Upload restart addon APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: restart-addon
-          path: addons/restart/app/build/outputs/apk/release/app-release.apk
-          retention-days: 7

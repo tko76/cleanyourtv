@@ -1,0 +1,4 @@
+# TCL G03 Google TV (G03_4K_US_NF, Android 11, SDK 30) - Batch 1: Telemetry
+com.tcl.bi
+com.tcl.xian.StartandroidService
+com.google.android.feedback

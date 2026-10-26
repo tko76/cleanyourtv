@@ -1,0 +1,12 @@
+# Batch 2: Sony content rows, promo surfaces, demo mode
+com.sony.dtv.promos
+com.sony.dtv.sonyselect
+com.sony.dtv.sonytab
+com.sony.dtv.smartmediaapp
+com.sony.dtv.demosupport
+com.sony.dtv.demosystemsupport
+com.sony.dtv.multiscreendemo
+com.sony.dtv.customersupport
+com.sony.dtv.customersupport.provider.res
+com.sony.dtv.smarthelp
+com.sony.dtv.helpguidecontents

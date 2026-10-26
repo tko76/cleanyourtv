@@ -242,8 +242,6 @@ final class Config {
     final boolean wifiStatusWarnings;
     /** Apps shown as round logo buttons in the top bar, left of the network pill, and no longer as tiles (config.xml, top_bar_apps). */
     final List<String> topBarApps;
-    /** Apps shown as round logo buttons in the top bar, right of the Settings pill, and no longer as tiles (config.xml, right_bar_apps). */
-    final List<String> rightBarApps;
     /** The greeting above the clock (Good evening); false hides it (config.xml, show_greeting). */
     final boolean showGreeting;
     /** The date and the line between it and the clock in the clock's full white instead of dimmed (config.xml, header_white). */
@@ -272,7 +270,7 @@ final class Config {
                    List<RaceWeekend.Race> raceCalendar, boolean cinematicHome, boolean ambientGlow, boolean appGlow, boolean fadeRows, int homeIdleClockMinutes,
                    boolean keyFilter, boolean dockGlass, String glowStyle, boolean wallpaperCaptions,
                    boolean handleViewInputs, boolean tileMenu, boolean dockEvenPadding, boolean dockBand, boolean cinematicDots, boolean cinematicWhiteFocus, boolean wifiStatusColor, int cinematicScrim, int cinematicArt,
-                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough, boolean consumeVolumeKeys, boolean powerOnHome, boolean homeLongPressHome, boolean wifiStatusWarnings, List<String> topBarApps, List<String> rightBarApps, boolean showGreeting, boolean headerWhite, boolean clockWallpaper, int clockWallpaperDim, boolean clockGlow, String glassStyle, boolean singleRow, boolean dockBandAll, boolean lunarDate, int lunarUtcOffset, boolean dateBelowClock, boolean vpnPill, String locale, boolean powerOnHomeAlways) {
+                   Map<String, Set<String>> wallpaperMoods, boolean gamepadPassthrough, boolean consumeVolumeKeys, boolean powerOnHome, boolean homeLongPressHome, boolean wifiStatusWarnings, List<String> topBarApps, boolean showGreeting, boolean headerWhite, boolean clockWallpaper, int clockWallpaperDim, boolean clockGlow, String glassStyle, boolean singleRow, boolean dockBandAll, boolean lunarDate, int lunarUtcOffset, boolean dateBelowClock, boolean vpnPill, String locale, boolean powerOnHomeAlways) {
         this.handleViewInputs = handleViewInputs;
         this.tileMenu = tileMenu;
         this.inputKeycodes = inputKeycodes;
@@ -369,7 +367,6 @@ final class Config {
         this.powerOnHomeAlways = powerOnHomeAlways;
         this.wifiStatusWarnings = wifiStatusWarnings;
         this.topBarApps = Collections.unmodifiableList(topBarApps);
-        this.rightBarApps = Collections.unmodifiableList(rightBarApps);
         this.showGreeting = showGreeting;
         this.headerWhite = headerWhite;
         this.clockWallpaper = clockWallpaper;
@@ -490,7 +487,6 @@ final class Config {
         boolean vpnPill = res.getBoolean(R.bool.vpn_pill);
         String locale = res.getString(R.string.locale).trim();
         List<String> topBarApps = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.top_bar_apps)));
-        List<String> rightBarApps = new ArrayList<>(Arrays.asList(res.getStringArray(R.array.right_bar_apps)));
         boolean showGreeting = res.getBoolean(R.bool.show_greeting);
         boolean headerWhite = res.getBoolean(R.bool.header_white);
         boolean clockWallpaper = res.getBoolean(R.bool.clock_wallpaper);
@@ -595,7 +591,6 @@ final class Config {
             vpnPill = bool(json, "vpn_pill", vpnPill);
             locale = string(json, "locale", locale).trim();
             topBarApps = stringList(json, "top_bar_apps", topBarApps);
-            rightBarApps = stringList(json, "right_bar_apps", rightBarApps);
             showGreeting = bool(json, "show_greeting", showGreeting);
             headerWhite = bool(json, "header_white", headerWhite);
             clockWallpaper = bool(json, "clock_wallpaper", clockWallpaper);
@@ -606,9 +601,8 @@ final class Config {
             glowStyle = string(json, "glow_style", glowStyle);
             glassStyle = string(json, "glass_style", glassStyle);
         }
-        // A top-bar or right-bar app is moved there, not copied: it leaves the grid.
+        // A top-bar app is moved there, not copied: it leaves the grid.
         for (String pkg : topBarApps) if (!hidden.contains(pkg)) hidden.add(pkg);
-        for (String pkg : rightBarApps) if (!hidden.contains(pkg)) hidden.add(pkg);
         // A theme push or reset invalidates choices made on the TV. On first use, remember the
         // current theme without clearing choices from an older launcher version.
         SharedPreferences choices = ctx.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE);
@@ -664,7 +658,7 @@ final class Config {
                 json == null ? Collections.emptyList() : raceCalendar(json), cinematic, ambientGlow, appGlow, fadeRows,
                 Math.max(0, idleClockMinutes), keyFilter, dockGlass, glowStyle, wallpaperCaptions, handleViewInputs, tileMenu, dockEvenPadding,
                 dockBand, cinematicDots, cinematicWhiteFocus, wifiStatusColor, cinematicScrim, cinematicArt, wallpaperMoods, gamepadPassthrough,
-                consumeVolumeKeys, powerOnHome, homeLongPressHome, wifiStatusWarnings, topBarApps, rightBarApps, showGreeting, headerWhite, clockWallpaper,
+                consumeVolumeKeys, powerOnHome, homeLongPressHome, wifiStatusWarnings, topBarApps, showGreeting, headerWhite, clockWallpaper,
                 Math.max(0, Math.min(90, clockWallpaperDim)), clockGlow, glassStyle, singleRow && dockRow, dockBandAll, lunar, lunarOffset,
                 dateBelowClock, vpnPill, locale, powerOnHomeAlways);
     }

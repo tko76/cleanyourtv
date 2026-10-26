@@ -1,0 +1,2 @@
+# TCL G03 - Batch 5: Disable launcherx (US firmware priority=2 outranks set-home-activity)
+com.google.android.apps.tv.launcherx
