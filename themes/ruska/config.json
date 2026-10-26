@@ -4,5 +4,6 @@
   "ambient_glow": false,
   "dock_opacity": 70,
   "app_glow": true,
-  "focus_overshoot": false
+  "focus_overshoot": false,
+  "top_bar_apps": ["io.github.tko76.restarttv"]
 }
