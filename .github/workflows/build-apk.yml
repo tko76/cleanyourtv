@@ -34,11 +34,6 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon assembleRelease
-      - name: Build restart addon APK
-        working-directory: addons/restart
-        run: |
-          chmod +x gradlew
-          ./gradlew --no-daemon assembleRelease
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
