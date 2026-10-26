@@ -786,7 +786,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             }
             int firstButton = btnInputs.getVisibility() == View.VISIBLE ? R.id.btnInputs : firstTopButton().getId();
             int leftButton = rtlMenuBar ? R.id.btnSettings : firstButton;
-            int rightButton = rtlMenuBar ? firstButton : R.id.btnSettings;
+            // If right_bar_apps buttons are present, the last visible one is the right end of the bar.
+            View lastRight = null;
+            for (int i = rightBarButtons.size() - 1; i >= 0; i--) {
+                if (rightBarButtons.get(i).getVisibility() == View.VISIBLE) { lastRight = rightBarButtons.get(i); break; }
+            }
+            int rightButton = rtlMenuBar ? firstButton : (lastRight != null ? lastRight.getId() : R.id.btnSettings);
             if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return v.getId() == leftButton;
             return keyCode == KeyEvent.KEYCODE_DPAD_RIGHT && v.getId() == rightButton;
         };
@@ -2319,6 +2324,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     /** top_bar_apps buttons, in bar order. */
     private final List<View> topAppButtons = new ArrayList<>();
+    private final List<View> rightBarButtons = new ArrayList<>();
 
     /**
      * Puts each app in the top bar as a round pill with the app's own logo.
@@ -2360,6 +2366,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // appendToEnd=true: append after all existing children (right of Settings).
             if (appendToEnd) {
                 bar.addView(button);
+                rightBarButtons.add(button);
             } else {
                 bar.addView(button, bar.indexOfChild(getResources().getBoolean(R.bool.rtl_menu_bar) ? btnVpn : btnWifi));
             }
