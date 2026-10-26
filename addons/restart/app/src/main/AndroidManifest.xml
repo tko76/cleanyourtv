@@ -7,7 +7,7 @@
     <application
         android:allowBackup="false"
         android:banner="@drawable/banner"
-        android:icon="@drawable/banner"
+        android:icon="@drawable/icon"
         android:label="@string/app_name">
 
         <!-- Opens as a transparent overlay, triggers the power dialog, then finishes immediately. -->
