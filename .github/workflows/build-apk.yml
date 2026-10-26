@@ -27,10 +27,15 @@ jobs:
       - name: Build release APK
         working-directory: launcher
         env:
-          KEYSTORE_PATH: /tmp/launcher-release.jks
+          KEYSTORE_PATH: /tmp/tvhome-release.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+      - name: Build restart addon APK
+        working-directory: addons/restart
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon assembleRelease
@@ -39,4 +44,10 @@ jobs:
         with:
           name: launcher-release
           path: launcher/app/build/outputs/apk/release/app-release.apk
+          retention-days: 7
+      - name: Upload restart addon APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: restart-addon
+          path: addons/restart/app/build/outputs/apk/release/app-release.apk
           retention-days: 7
