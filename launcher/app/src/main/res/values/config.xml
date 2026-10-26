@@ -211,7 +211,7 @@
     <!-- Home at every power-on, whatever the firmware put in front (the last HDMI input, Live TV or an app),
          for TVs that come back to the last source, like Philips. Needs HOME_KEY_SERVICE=1; a key pressed first
          wins. Ignored with boot_to_live_tv or an Open on start app. Can also be set with "power_on_home_always". -->
-    <bool name="power_on_home_always">false</bool>
+    <bool name="power_on_home_always">true</bool>
 
     <!-- Every press of the remote's Home button opens this launcher, a held one too. Android turns a Home press held
          past the long-press timeout (400 ms) into its long-press action; on Android TV that is ALL_APPS, sent to the
