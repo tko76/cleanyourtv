@@ -54,7 +54,7 @@ DEBLOAT_MAP["tcl"]="debloat-tcl-g03.txt"
 DEBLOAT_MAP["sony75"]="debloat-sony-vh2-uc.txt"
 # ──────────────────────────────────────────────────────────────────────────────
 FORK=tko76/cleanyourtv
-BRANCH=sony-vh2-setup
+BRANCH=main
 PY=tools/venv/bin/python
 UPDATE_APPS=0
 RUN_DEBLOAT=0
@@ -98,21 +98,18 @@ fi
 echo "==> Fetching upstream..."
 git fetch origin
 
-echo "==> Updating main..."
+echo "==> Updating main with upstream changes..."
 git checkout main
-git merge origin/main --ff-only
-
-echo "==> Rebasing $BRANCH on main..."
-git checkout "$BRANCH"
-if ! GIT_EDITOR=true git rebase main -Xours; then
-    echo "ERROR: rebase conflict. Run: git status"
-    echo "Fix, then: git add <file> && git rebase --continue"
-    echo "Or abort:  git rebase --abort"
+# -Xours keeps our config/theme files on conflict with upstream.
+if ! GIT_EDITOR=true git merge origin/main -Xours --no-edit; then
+    echo "ERROR: merge conflict -Xours could not auto-resolve."
+    echo "  git status && git add <file> && git merge --continue"
+    echo "  git merge --abort    — start over"
     exit 1
 fi
 
 echo "==> Pushing to fork..."
-git push fork "$BRANCH" --force-with-lease
+git push fork main
 
 # ── Build launcher ─────────────────────────────────────────────────────────────
 echo "==> Waiting for GitHub Actions build..."

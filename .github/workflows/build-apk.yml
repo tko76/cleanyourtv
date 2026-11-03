@@ -2,7 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [sony-vh2-setup]
+    branches: [main]
   workflow_dispatch:
 
 permissions:

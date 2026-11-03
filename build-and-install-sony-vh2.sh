@@ -6,7 +6,7 @@ set -euo pipefail
 
 TV_HOST="${TV_HOST:-10.44.0.96}"
 FORK_REPO="tko76/cleanyourtv"
-BRANCH="sony-vh2-setup"
+BRANCH="main"
 
 echo "==> Committing config changes..."
 cd "$(dirname "$0")"
