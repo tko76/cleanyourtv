@@ -41,7 +41,7 @@ TV_REGISTRY=(
 APK_REGISTRY=(
     "nuvio:com.nuvio.tv:github:NuvioMedia/NuvioTV"
     "smarttube:org.smarttube.stable:github:yuliskov/SmartTube:universal"
-    # "janky:com.player.janky:file:apps/janky.apk"
+    "janky:com.player.janky:github:jankyapp/jankyapp"
     # "downloader:com.esaba.downloader:file:apps/downloader.apk"
 )
 # ──────────────────────────────────────────────────────────────────────────────
