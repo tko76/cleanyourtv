@@ -1,0 +1,44 @@
+# TCL G03 Google TV (G03_4K_US_NF, Android 11, SDK 30) — combined debloat
+# Apply:  FORCE_SETUPWRAITH=1 TV_HOST=<ip> tools/disable.sh debloat-tcl-g03.txt
+# Undo:   TV_HOST=<ip> tools/restore.sh debloat-tcl-g03.txt com.google.android.apps.tv.launcherx
+# TV is on Ethernet so FORCE_SETUPWRAITH=1 is safe (no Wi-Fi network to lose).
+
+# ---- Telemetry ----
+com.tcl.bi
+com.tcl.xian.StartandroidService
+com.google.android.feedback
+
+# ---- Content rows, ads, partner installs ----
+com.tcl.dashboard
+com.tcl.partnercustomizer
+com.tcl.messagebox
+com.tcl.esticker
+com.tcl.waterfall.overseas
+android.autoinstalls.config.google.gtvpai
+com.google.android.partnersetup
+com.google.android.onetimeinitializer
+
+# ---- Background services, streaming apps, voice/casting ----
+com.tcl.guard
+com.tcl.usercenter
+com.tcl.android.webview
+org.chromium.webview_shell
+com.google.android.syncadapters.calendar
+com.google.android.play.games
+com.tcl.gallery
+com.netflix.ninja
+com.amazon.amazonvideo.livingroom
+com.google.android.youtube.tvmusic
+com.google.android.videos
+com.tcl.ui_mediaCenter
+com.tcl.channelplus
+com.tcl.assistant
+com.tcl.smartalexa
+com.google.android.apps.mediashell
+
+# ---- Google TV setup wizard and ambient ads screensaver ----
+com.google.android.tungsten.setupwraith
+com.google.android.apps.tv.dreamx
+
+# ---- Stock Google TV launcher (US firmware: priority=2 outranks set-home-activity) ----
+com.google.android.apps.tv.launcherx

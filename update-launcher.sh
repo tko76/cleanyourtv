@@ -44,12 +44,20 @@ APK_REGISTRY=(
     "janky:com.player.janky:github:jankyapp/jankyapp"
     "downloader:com.esaba.downloader:file:apps/downloader.apk"
 )
+# ── Debloat map ────────────────────────────────────────────────────────────────
+# TV name → debloat list (relative to repo root).
+# Run with --debloat to apply; safe to re-run (already-disabled packages skipped).
+# Both TVs are on Ethernet so FORCE_SETUPWRAITH=1 is always safe here.
+declare -A DEBLOAT_MAP
+DEBLOAT_MAP["sony65"]="debloat-sony-vh2-uc.txt"
+DEBLOAT_MAP["tcl"]="debloat-tcl-g03.txt"
+DEBLOAT_MAP["sony75"]="debloat-sony-vh2-uc.txt"
 # ──────────────────────────────────────────────────────────────────────────────
-
 FORK=tko76/cleanyourtv
 BRANCH=sony-vh2-setup
 PY=tools/venv/bin/python
 UPDATE_APPS=0
+RUN_DEBLOAT=0
 
 # Parse arguments.
 declare -A WANTED
@@ -57,6 +65,8 @@ WANT_ALL=1
 for arg in "$@"; do
     if [ "$arg" = "--update-apps" ]; then
         UPDATE_APPS=1
+    elif [ "$arg" = "--debloat" ]; then
+        RUN_DEBLOAT=1
     else
         WANTED["${arg#--}"]=1
         WANT_ALL=0
@@ -203,6 +213,17 @@ install_tv() {
     if [ -n "$theme" ]; then
         echo "    [$name] Applying theme: $theme"
         TV_HOST="$ip" tools/theme.sh "$theme"
+    fi
+
+    # Debloat
+    if [ "$RUN_DEBLOAT" -eq 1 ]; then
+        debloat_list="${DEBLOAT_MAP[$name]+${DEBLOAT_MAP[$name]}}"
+        if [ -n "$debloat_list" ] && [ -f "$debloat_list" ]; then
+            echo "    [$name] Running debloat: $debloat_list"
+            FORCE_SETUPWRAITH=1 TV_HOST="$ip" tools/disable.sh "$debloat_list"
+        else
+            echo "    [$name] No debloat list configured — skipping (add to DEBLOAT_MAP)."
+        fi
     fi
 
     # Apps
