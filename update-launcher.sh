@@ -241,6 +241,9 @@ install_tv() {
         fi
     fi
 
+    # Disable package verification for sideloaded APKs, restore when done.
+    adb -s "$ip:5555" shell settings put global verifier_verify_adb_installs 0 2>/dev/null || true
+
     # Apps
     for apk_name in "${!APK_PATHS[@]}"; do
         local_apk="${APK_PATHS[$apk_name]}"
@@ -258,6 +261,7 @@ install_tv() {
             echo "    [$name] $apk_name installed." || \
             echo "    [$name] WARNING: $apk_name install failed."
     done
+    adb -s "$ip:5555" shell settings put global verifier_verify_adb_installs 1 2>/dev/null || true
 }
 
 for target in "${TARGETS[@]}"; do
