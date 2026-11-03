@@ -39,7 +39,7 @@ TV_REGISTRY=(
 #
 # Apps are skipped when already installed unless --update-apps is passed.
 APK_REGISTRY=(
-    "nuvio:com.nuvio.tv:github:NuvioMedia/NuvioTV"
+    "nuvio:com.nuvio.tv:github:NuvioMedia/NuvioTV:universal"
     "smarttube:org.smarttube.stable:github:yuliskov/SmartTube:universal"
     "janky:com.player.janky:github:jankyapp/jankyapp"
     "downloader:com.esaba.downloader:file:apps/downloader.apk"
@@ -152,8 +152,8 @@ for entry in "${APK_REGISTRY[@]}"; do
             pattern="${src_val#*:}"
             [ "$pattern" = "$src_val" ] && pattern=".apk"   # no pattern given
             echo "==> [app:$apk_name] Fetching latest release from github:$owner_repo (pattern: $pattern)..."
-            dl_url=$(gh api "repos/$owner_repo/releases/latest" \
-                --jq ".assets[] | select(.name | test(\"$(printf '%s' "$pattern" | sed 's/\./\\./g')\")) | .browser_download_url" \
+            dl_url=$(gh api "repos/$owner_repo/releases?per_page=1" \
+                --jq ".[0].assets[] | select(.name | test(\"$(printf '%s' "$pattern" | sed 's/\./\\./g')\")) | .browser_download_url" \
                 2>/dev/null | head -1 || true)
             if [ -z "$dl_url" ]; then
                 echo "    WARNING: no matching asset found for $apk_name — skipping."
@@ -192,12 +192,14 @@ install_tv() {
     echo "==> [$name] Connecting to $ip..."
     adb connect "$ip:5555" 2>/dev/null || true
 
-    # Launcher
+    # Launcher — push then install
+    echo "    [$name] Pushing launcher..."
+    TV_HOST="$ip" "$PY" -I tools/b64push.py "$TMPDIR/launcher/app-release.apk" /data/local/tmp/launcher.apk
     echo "    [$name] Installing launcher..."
     if adb -s "$ip:5555" shell pm install -r /data/local/tmp/launcher.apk 2>&1 | grep -q "Success"; then
         echo "    [$name] Launcher updated in-place."
     else
-        "$PY" -I tools/b64push.py "$TMPDIR/launcher/app-release.apk" /data/local/tmp/launcher.apk
+        echo "    [$name] Signature mismatch — uninstalling and reinstalling..."
         adb -s "$ip:5555" shell pm uninstall com.gathin.tvhome 2>/dev/null || true
         adb -s "$ip:5555" shell pm install /data/local/tmp/launcher.apk
         adb -s "$ip:5555" shell \
@@ -235,20 +237,12 @@ install_tv() {
         fi
 
         echo "    [$name] Installing $apk_name ($pkg)..."
-        "$PY" -I tools/b64push.py "$local_apk" "/data/local/tmp/${apk_name}.apk"
+        TV_HOST="$ip" "$PY" -I tools/b64push.py "$local_apk" "/data/local/tmp/${apk_name}.apk"
         adb -s "$ip:5555" shell pm install -r "/data/local/tmp/${apk_name}.apk" && \
             echo "    [$name] $apk_name installed." || \
             echo "    [$name] WARNING: $apk_name install failed."
     done
 }
-
-# Push launcher APK to all TVs first (one upload per TV happens inside install_tv)
-for target in "${TARGETS[@]}"; do
-    name="${target%%:*}"; rest="${target#*:}"; ip="${rest%%:*}"; theme="${rest#*:}"
-    # Pre-push launcher so it's ready before install_tv tries pm install -r
-    adb connect "$ip:5555" 2>/dev/null || true
-    "$PY" -I tools/b64push.py "$TMPDIR/launcher/app-release.apk" /data/local/tmp/launcher.apk 2>/dev/null || true
-done
 
 for target in "${TARGETS[@]}"; do
     name="${target%%:*}"; rest="${target#*:}"; ip="${rest%%:*}"; theme="${rest#*:}"
