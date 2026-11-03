@@ -114,10 +114,10 @@ git push fork main
 # ── Build launcher ─────────────────────────────────────────────────────────────
 echo "==> Waiting for GitHub Actions build..."
 sleep 8
-RUN_ID=$(gh run list --repo "$FORK" --limit 1 --json databaseId -q '.[0].databaseId')
+RUN_ID=$(gh run list --repo "$FORK" --workflow "Build APK" --limit 1 --json databaseId -q '.[0].databaseId')
 echo "    Run $RUN_ID"
 gh run watch --repo "$FORK" "$RUN_ID"
-STATUS=$(gh run list --repo "$FORK" --limit 1 --json conclusion -q '.[0].conclusion')
+STATUS=$(gh run list --repo "$FORK" --workflow "Build APK" --limit 1 --json conclusion -q '.[0].conclusion')
 if [ "$STATUS" != "success" ]; then
     echo "Build failed ($STATUS). Check: gh run view --repo $FORK $RUN_ID"
     exit 1
