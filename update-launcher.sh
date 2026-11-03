@@ -210,7 +210,7 @@ install_tv() {
 
     # Launcher — push then install
     echo "    [$name] Pushing launcher..."
-    TV_HOST="$ip" "$PY" -I tools/b64push.py "$TMPDIR/launcher/app-release.apk" /data/local/tmp/launcher.apk
+    adb -s "$ip:5555" push "$TMPDIR/launcher/app-release.apk" /data/local/tmp/launcher.apk
     echo "    [$name] Installing launcher..."
     if adb -s "$ip:5555" shell pm install -r /data/local/tmp/launcher.apk 2>&1 | grep -q "Success"; then
         echo "    [$name] Launcher updated in-place."
@@ -253,7 +253,7 @@ install_tv() {
         fi
 
         echo "    [$name] Installing $apk_name ($pkg)..."
-        TV_HOST="$ip" "$PY" -I tools/b64push.py "$local_apk" "/data/local/tmp/${apk_name}.apk"
+        adb -s "$ip:5555" push "$local_apk" "/data/local/tmp/${apk_name}.apk"
         adb -s "$ip:5555" shell pm install -r "/data/local/tmp/${apk_name}.apk" && \
             echo "    [$name] $apk_name installed." || \
             echo "    [$name] WARNING: $apk_name install failed."
