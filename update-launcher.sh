@@ -40,7 +40,7 @@ TV_REGISTRY=(
 # Apps are skipped when already installed unless --update-apps is passed.
 APK_REGISTRY=(
     "nuvio:com.nuvio.tv:github:NuvioMedia/NuvioTV"
-    "smarttube:org.smarttube.stable:github:yuliskov/SmartTube:SmartTube.apk"
+    "smarttube:org.smarttube.stable:github:yuliskov/SmartTube:universal"
     # "janky:com.player.janky:file:apps/janky.apk"
     # "downloader:com.esaba.downloader:file:apps/downloader.apk"
 )
