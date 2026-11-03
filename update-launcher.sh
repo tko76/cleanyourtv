@@ -41,8 +41,8 @@ TV_REGISTRY=(
 APK_REGISTRY=(
     "nuvio:com.nuvio.tv:github:NuvioMedia/NuvioTV"
     "smarttube:org.smarttube.stable:github:yuliskov/SmartTube:SmartTube.apk"
-    # "janky:com.player.janky:file:~/Downloads/janky.apk"
-    # "downloader:com.esaba.downloader:url:https://example.com/downloader.apk"
+    # "janky:com.player.janky:file:apps/janky.apk"
+    # "downloader:com.esaba.downloader:file:apps/downloader.apk"
 )
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -159,7 +159,9 @@ for entry in "${APK_REGISTRY[@]}"; do
             curl -fsSL "$src_val" -o "$dest"
             ;;
         file)
+            # Relative paths resolve from repo root (the script cd's there at startup).
             local_path="${src_val/#\~/$HOME}"
+            [[ "$local_path" != /* ]] && local_path="$(pwd)/$local_path"
             if [ ! -f "$local_path" ]; then
                 echo "    WARNING: local file not found: $local_path — skipping $apk_name."
                 continue
