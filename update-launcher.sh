@@ -22,8 +22,9 @@ cd "$(dirname "$0")"
 # Format: "name:ip:theme_path"
 # theme_path is relative to this repo; leave empty to skip theme push.
 TV_REGISTRY=(
-    "sony:10.44.0.96:themes/ruska"
-    "tcl:10.44.0.98:examples/tcl-g03-google-tv"
+    "sony65:10.44.0.96:themes/ruska"
+    "tcl:10.44.0.98:themes/ruska"
+    "sony75:10.44.0.87:themes/ruska"
 )
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -60,6 +61,13 @@ fi
 echo "==> TVs to update: $(printf '%s ' "${TARGETS[@]}" | sed 's/:[^:]*:[^ ]*//g')"
 
 # ── Git update ─────────────────────────────────────────────────────────────────
+# Commit any local edits (e.g. a new TV added to TV_REGISTRY) before switching branches.
+if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "==> Committing local changes before rebase..."
+    git add -A
+    GIT_EDITOR=true git commit -m "Local update ($(date '+%Y-%m-%d'))"
+fi
+
 echo "==> Fetching upstream..."
 git fetch origin
 
