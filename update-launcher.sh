@@ -42,7 +42,7 @@ APK_REGISTRY=(
     "nuvio:com.nuvio.tv:github:NuvioMedia/NuvioTV:universal"
     "smarttube:org.smarttube.stable:github:yuliskov/SmartTube:universal"
     "janky:com.player.janky:github:jankyapp/jankyapp"
-    "downloader:com.esaba.downloader:file:apps/downloader.apk"
+    "downloader:com.esaba.downloader:file:apps/com.esaba.downloader_2.0.4-ForGoogleAndroidDevices-75_4arch_7dpi_24lang_7abbda810f2e94eef1c2c9f3acf3ed24_apkmirror.com.apkm"
 )
 # ── Debloat map ────────────────────────────────────────────────────────────────
 # TV name → debloat list (relative to repo root).
@@ -173,7 +173,16 @@ for entry in "${APK_REGISTRY[@]}"; do
                 echo "    WARNING: local file not found: $local_path — skipping $apk_name."
                 continue
             fi
-            cp "$local_path" "$dest"
+            # Unbundle .apkm/.apks (APKMirror bundles are zips containing base.apk)
+            case "$local_path" in
+                *.apkm|*.apks)
+                    echo "==> [app:$apk_name] Extracting base.apk from bundle..."
+                    unzip -p "$local_path" base.apk > "$dest"
+                    ;;
+                *)
+                    cp "$local_path" "$dest"
+                    ;;
+            esac
             ;;
         *)
             echo "    WARNING: unknown source type '$src_type' for $apk_name — skipping."
