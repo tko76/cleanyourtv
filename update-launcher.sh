@@ -200,6 +200,13 @@ install_tv() {
     echo ""
     echo "==> [$name] Connecting to $ip..."
     adb connect "$ip:5555" 2>/dev/null || true
+    # If the TV shows unauthorized (stale daemon key), restart and reconnect once.
+    if adb -s "$ip:5555" shell echo ok 2>&1 | grep -q "unauthorized"; then
+        echo "    [$name] Restarting ADB daemon (stale key)..."
+        adb kill-server
+        sleep 2
+        adb connect "$ip:5555" 2>/dev/null || true
+    fi
 
     # Launcher — push then install
     echo "    [$name] Pushing launcher..."
