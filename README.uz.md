@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  Oʻqing: <a href="README.md">English</a> · <a href="README.he.md" lang="he" dir="rtl">עברית</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">正體中文</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.ja.md">日本語</a> · <a href="README.it.md">Italiano</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.de.md">Deutsch</a> · <a href="README.uk.md">Українська</a> · <a href="README.tr.md">Türkçe</a> · Oʻzbekcha · <a href="README.fr.md">Français</a>
+  Oʻqing: <a href="README.md">English</a> · <a href="README.he.md" lang="he" dir="rtl">עברית</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">正體中文</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.ja.md">日本語</a> · <a href="README.it.md">Italiano</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.de.md">Deutsch</a> · <a href="README.uk.md">Українська</a> · <a href="README.tr.md">Türkçe</a> · Oʻzbekcha · <a href="README.fr.md">Français</a> · <a href="README.es.md">Español</a>
 </p>
 
 <p align="center">
@@ -479,7 +479,7 @@ birinchi toʻrt kunda 200 dan ortiq hissa qoʻshuvchidan 170 dan ortiq TV modeli
 deb ataldi; eski havolalar ishlaydi.
 
 Ikki hafta oʻtib, 19–25 oktabr haftasida GitHub ning 1-oʻrindagi trend ombori boʻldi; 46 mingdan ortiq yulduz,
-5,7 ming fork, 14 kunda 1,4 million koʻrish va 260 ming klon. Roʻyxatlar endi 466 TV modelini va 126 brendni
+5,7 ming fork, 14 kunda 1,4 million koʻrish va 260 ming klon. Roʻyxatlar endi 468 TV modelini va 126 brendni
 qamrab oladi. Matbuotdagi aks: 534 maqola (57 mamlakatdan) va YouTube hamda Bilibili da 663 video, hammasi
 [docs/PRESS.md](docs/PRESS.md) da (raqamlar 2026-yil 9-noyabr holatiga).
 
@@ -493,7 +493,7 @@ Kodlash agenti orqali hissa qoʻshyapsizmi? [AGENTS.md](AGENTS.md) unga xuddi sh
 |---|---|
 | **Televizoringizning tozalash roʻyxati** | Eng foydalisi: shu modelga ega keyingi kishi kashfiyotni oʻtkazib yuboradi. |
 | **Launcher va prompt** | Launcher yaxshilanishlari va promptning aniqroq ifodalanishi ham mamnuniyat bilan qabul qilinadi. |
-| **Ustiga biror narsa qildingizmi?** | Launcher, port, mavzu: [SHOWCASE.md](SHOWCASE.md) ga qoʻshing; u yerda bosh ekranlar, fork lar, qoʻshimchalar, vositalar va boshqa platformalar boʻyicha tartiblangan, TV brendi boʻyicha indekslangan 234 ta loyiha allaqachon yashaydi. |
+| **Ustiga biror narsa qildingizmi?** | Launcher, port, mavzu: [SHOWCASE.md](SHOWCASE.md) ga qoʻshing; u yerda bosh ekranlar, fork lar, qoʻshimchalar, vositalar va boshqa platformalar boʻyicha tartiblangan, TV brendi boʻyicha indekslangan 239 ta loyiha allaqachon yashaydi. |
 
 Ishlari bu omborda joylashgan odamlar:
 

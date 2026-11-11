@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  Lire en : <a href="README.md">English</a> · <a href="README.he.md" lang="he" dir="rtl">עברית</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">正體中文</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.ja.md">日本語</a> · <a href="README.it.md">Italiano</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.de.md">Deutsch</a> · <a href="README.uk.md">Українська</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.uz.md">Oʻzbekcha</a> · Français
+  Lire en : <a href="README.md">English</a> · <a href="README.he.md" lang="he" dir="rtl">עברית</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.zh-TW.md">正體中文</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.ja.md">日本語</a> · <a href="README.it.md">Italiano</a> · <a href="README.pt-BR.md">Português</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.de.md">Deutsch</a> · <a href="README.uk.md">Українська</a> · <a href="README.tr.md">Türkçe</a> · <a href="README.uz.md">Oʻzbekcha</a> · Français · <a href="README.es.md">Español</a>
 </p>
 
 <p align="center">
@@ -183,7 +183,7 @@ tools/restore.sh examples/xiaomi-mi-tv-4a/debloat.txt        # l'annuler, launch
 tools/venv/bin/python -I tools/check.py examples/xiaomi-mi-tv-4a/debloat.txt   # ce qu'une mise à jour du firmware a défait
 launcher/build-and-install.sh                                # compiler le launcher et en faire l'accueil (nécessite l'export TV_HOST ci-dessus)
 tools/theme.sh themes/aurora                                 # envoyer un thème ; --reset le retire
-python3 tools/wallpaper_prep.py ~/Pictures/trip mytheme/wallpapers   # vos photos, dimensionnées et assombries pour le téléviseur
+tools/venv/bin/python -I tools/wallpaper_prep.py ~/Pictures/trip mytheme/wallpapers   # vos photos, dimensionnées et assombries pour le téléviseur
 ```
 
 | Outil | Ce qu'il fait |
@@ -310,11 +310,13 @@ avec le dépôt : vous apportez les vôtres, et c'est à vous de vous assurer qu
 2. **Préparez les photos.** Une photo lumineuse de 12 Mpx est lourde pour un téléviseur de 1 à 2 Go et noie
    l'horloge et les vignettes. `tools/wallpaper_prep.py` recadre au centre en 16:9, enregistre des JPEG 1280×720 de
    moins de 300 Ko, et assombrit l'image elle-même, si bien que `wallpaper_dim` peut rester à 0. Les photos HEIC des
-   téléphones fonctionnent. Vos originaux ne sont jamais modifiés.
+   téléphones fonctionnent. Vos originaux ne sont jamais modifiés. Pillow s'installe dans le `tools/venv`
+   créé par le démarrage rapide, et non dans un Python système : celui-ci n'a pas le paquet, et sous
+   Ubuntu son pip n'a pas le droit de l'installer.
 
    ```bash
-   python3 -m pip install -r tools/requirements-photos.txt
-   python3 tools/wallpaper_prep.py ~/Pictures/trip mytheme/wallpapers
+   tools/venv/bin/pip install -r tools/requirements-photos.txt
+   tools/venv/bin/python -I tools/wallpaper_prep.py ~/Pictures/trip mytheme/wallpapers
    ```
 
    Options : `--brightness 0.25` (de 0.1 à 1.0), `--gradient 0.6` (davantage de noir vers le dock), `--size 1280x720`,
@@ -544,7 +546,7 @@ tv-vibehack jusqu'au 19 ; les anciens liens fonctionnent toujours.
 
 Deux semaines plus tard, c'était le dépôt n° 1 des tendances sur GitHub pour la semaine du 19 au 25 octobre, avec
 plus de 46 000 étoiles et 5 700 forks, ainsi que 1,4 million de vues et 260 000 clones en 14 jours. Les listes
-couvrent désormais 466 modèles de téléviseurs de 126 marques. La couverture médiatique : 534 articles de 57 pays et
+couvrent désormais 468 modèles de téléviseurs de 126 marques. La couverture médiatique : 534 articles de 57 pays et
 663 vidéos sur YouTube et Bilibili, tous recensés dans [docs/PRESS.md](docs/PRESS.md)
 (chiffres au 9 novembre 2026).
 
@@ -558,7 +560,7 @@ demandons. Vous contribuez par l'intermédiaire d'un agent de code ? [AGENTS.md]
 |---|---|
 | **La liste de nettoyage de votre téléviseur** | La plus utile : la prochaine personne qui a ce modèle saute l'étape de découverte. |
 | **Launcher et prompt** | Les améliorations du launcher et une formulation plus précise du prompt sont aussi les bienvenues. |
-| **Vous avez construit quelque chose par-dessus ?** | Un launcher, un portage, un thème : ajoutez-le à [SHOWCASE.md](SHOWCASE.md), qui rassemble déjà 234 projets, classés en écrans d'accueil, forks, add-ons, outils et autres plateformes, avec un index par marque de téléviseur. |
+| **Vous avez construit quelque chose par-dessus ?** | Un launcher, un portage, un thème : ajoutez-le à [SHOWCASE.md](SHOWCASE.md), qui rassemble déjà 239 projets, classés en écrans d'accueil, forks, add-ons, outils et autres plateformes, avec un index par marque de téléviseur. |
 
 Les personnes dont le travail figure dans ce dépôt :
 
