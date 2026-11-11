@@ -1,0 +1,58 @@
+# Chromecast with Google TV 4K, Workshop (device sabrina, product sabrina_prod_stable), Wi-Fi
+# Google TV 14 (SDK 34), build UTTC.250917.004 (14193937)
+#
+# Apply:   TV_HOST=10.44.0.88 tools/disable.sh debloat-chromecast-workshop.txt
+# Undo:    TV_HOST=10.44.0.88 tools/restore.sh debloat-chromecast-workshop.txt com.google.android.apps.tv.launcherx
+#
+# Full launcher takeover chosen (not debloat-keep-cast.txt): phone casting stops working once
+# setupwraith is disabled, because it holds the Cast receiver's device credentials
+# (examples/google-chromecast-gtv-4k/debloat.txt has the full quirk and the per-boot credential
+# workaround, not applied here by choice).
+#
+# On Wi-Fi: every saved network belonged to setupwraith before this was applied. Forgot the network and
+# rejoined it in Settings > Network & Internet first, so every cname read android.uid.system:1000
+# (checked with `dumpsys wifi | grep -o 'cname=[^ ]*'`) before setupwraith went in this list.
+# No FORCE_SETUPWRAITH: disable.sh's own Wi-Fi-ownership check is left on for this device.
+#
+# launcher's Clock screensaver set first (settings put secure screensaver_components
+# com.gathin.tvhome/.ClockDream), so disabling dreamx/backdrop doesn't leave the screensaver pointing
+# at nothing.
+#
+# No Live TV app and no HDMI inputs (it's a dongle): live_tv_package stays empty.
+# Kept on purpose: Google Assistant (com.google.android.katniss), phone remote
+# (com.google.android.tv.remote.service), Play Store/Play Services, Gboard, Bluetooth,
+# com.google.android.tv.dfuservice (remote firmware updates), the already-sideloaded apps
+# (com.player.janky, com.esaba.downloader, ar.tvplayer.tv, nuvio, smarttube).
+# com.google.android.apps.education.cast2class and com.google.android.tvrecommendations ship
+# factory-disabled; not listed here (pm disable-user on them fails with "Shell cannot change
+# component state").
+
+# Telemetry, feedback and ads
+com.google.android.feedback
+com.android.tv.feedbackconsent
+com.google.android.tv.remotecontrol.logging     # remote usage logging
+com.google.android.apps.tv.netoscope            # network diagnostics reporting
+com.google.android.federatedcompute
+com.google.android.ondevicepersonalization.services
+com.google.android.adservices.api               # Privacy Sandbox ad services
+com.google.android.ext.adservices.api
+
+# Preloaded apps, owner's choice
+com.google.android.play.games
+com.google.android.videos                       # Google TV / Play Movies
+com.android.printspooler
+com.google.android.marvin.talkback              # re-enable if you need the screen reader
+
+# Google ambient mode screensaver (replaced by the launcher's Clock screensaver, set above)
+com.google.android.apps.tv.dreamx
+com.google.android.backdrop
+
+# Google TV setup wizard: claims HOME at priority=1 once launcherx is gone. Must be disabled in the
+# same run as launcherx so disable.sh's Home guard allows it (#1573, same note in tools/disable.sh).
+# Casting from a phone stops working once this is gone (device credentials live in its CastInfoProvider).
+com.google.android.tungsten.setupwraith
+
+# Stock Google TV launcher. launcherx registers HOME at priority=2, which outranks
+# `cmd package set-home-activity`: must be disabled together with setupwraith above, after the new
+# launcher is installed and registered (already true here, see priority=0 for com.gathin.tvhome).
+com.google.android.apps.tv.launcherx

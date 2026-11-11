@@ -1,0 +1,90 @@
+# Sylvox outdoor TV (built by KONKA, model KKRTK2865PSYLVOX), Realtek RTD285x, Workshop/outdoor unit
+# Google TV 14 (SDK 34), build UKRE.260524.026 - same platform family as examples/philips-r8g-google-tv
+# and examples/thomson-43rt1055 (Realtek universal Google TV firmware line).
+#
+# Apply:   TV_HOST=10.44.0.244 tools/disable.sh debloat-sylvox-outdoor.txt
+# Undo:    TV_HOST=10.44.0.244 tools/restore.sh debloat-sylvox-outdoor.txt com.google.android.apps.tv.launcherx
+#
+# On Ethernet (eth0 up, wlan0 down/no-carrier): FORCE_SETUPWRAITH=1 is safe here, same as the Sony/TCL
+# units. Owner's choice: disable everything optional, including casting, Assistant, and all preloaded
+# content/streaming/karaoke/mirroring apps - this device is being set up clean, not kept close to stock.
+#
+# Home claimants (same chain as the Philips R8G example): launcherx (priority 2), setupwraith
+# RecoveryActivity (1), com.realtek.systemservice FallbackHome (-999), com.android.tv.settings
+# FallbackHome (-1000). Install the new launcher and verify it is registered BEFORE running this list,
+# so disable.sh's Home guard allows launcherx+setupwraith to go together.
+#
+# Live TV app: com.realtek.tv (TvActivity). HDMI/AV: com.realtek.tv.passthrough. Tuners: com.realtek.dtv,
+# com.realtek.dtmb, com.realtek.tv.atv, com.realtek.tv.atsc, com.realtek.tv.isdb.
+#
+# Kept on purpose, never disable:
+# - com.realtek.tv, com.realtek.tv.passthrough, com.realtek.dtv, com.realtek.dtmb, com.realtek.tv.atv,
+#   com.realtek.tv.atsc, com.realtek.tv.isdb, com.android.providers.tv: Live TV, HDMI, AV, tuners.
+# - com.realtek.menu, com.realtek.slices, com.realtek.globalkeyhandler, com.google.android.tv.globalkeyhandler,
+#   com.realtek.android.tv.globalkeyoverlay, com.google.android.tv.globalkeyoverlay: source menu, Input/Settings keys.
+# - com.realtek.systemservice, com.realtek.power, com.realtek.energymode, com.realtek.display.monitor,
+#   com.realtek.frameworkoverlay, com.realtek.lowram_4k.frameworkoverlay, com.realtek.secservice,
+#   com.realtek.service.agent, com.realtek.mdnsoffload, com.android.tv.mdnsoffloadmanager,
+#   com.realtek.media.notification (codec notices).
+# - com.realtek.connecteddevices (Bluetooth "Connected devices" settings page), com.android.bluetooth.
+# - com.google.android.tv.remote.service, com.google.android.tv.dfuservice (phone remote, firmware, find-my-remote),
+#   com.google.android.tv.googletvremotepairer(+customizationsample) (Bluetooth remote pairing).
+# - com.realtek.rtkvirtualkeyboard, com.google.android.inputmethod.latin (keyboards).
+# - com.android.vending, com.google.android.gms, com.google.android.gsf (Play Store/Services - core).
+# - com.google.android.webview, com.google.android.tts.
+# - com.realtek.tvsettings.* overlays, com.android.tv.settings, com.android.systemui (TvSystemUI).
+# - com.google.android.tv.inputplayer(+overlay), com.realtek.android.tv.inputplayer.customization.
+# - com.dolby.android.audio.service.
+# - Factory packages, NEVER launch, NOT disabled either (left alone, matching the Thomson/Philips
+#   convention): com.toptech.tvfactory, com.toptech.factorytoolsgtv, com.realtek.tvfactory, com.hk.factorymenu,
+#   com.factory.factoryautomation.
+
+# === Telemetry / ACR ===
+tv.anoki.acr.anokiacroptin                      # Anoki ACR: fingerprints what's on screen
+com.android.tv.feedbackconsent
+com.google.android.feedback
+
+# === Android ad / personalisation services ===
+com.android.adservices.api
+com.android.ondevicepersonalization.services
+com.android.federatedcompute.services
+
+# === Manufacturer content, retail/demo mode, unused engines ===
+com.realtek.leanbacklauncher.partnercustomizer  # only feeds the stock launcher's rows; harmless once launcherx is gone
+com.realtek.retailmode                          # store demo mode
+com.konka.livewallpaper                         # packaged as "KonkaRetailMode" despite the id
+com.vewd.core.service                           # Vewd HbbTV/operator-app engine; unused (US, no HbbTV)
+com.cltv.mal                                    # Common Live TV content/metadata service (Anoki-adjacent)
+com.cltv.hybrid                                 # Common Live TV hybrid broadcast app
+
+# === Not needed on a TV ===
+com.android.healthconnect.controller
+com.android.health.connect.backuprestore
+
+# === Preloaded streaming/content apps - owner's choice: all off ===
+com.netflix.ninja
+com.netflix.tokenmanager                        # Netflix token helper; pointless without Netflix enabled
+com.disney.disneyplus
+com.hulu.livingroomplus
+com.amazon.amazonvideo.livingroom
+com.tubitv
+com.haystack.android                            # Haystack TV news aggregator
+com.google.android.youtube.tvmusic
+com.google.android.youtube.tvunplugged          # YouTube TV (live cable-replacement subscription)
+com.instagram.airwave                           # Instagram's TV/ambient photo app
+
+# === Karaoke and screen mirroring - owner's choice: both off ===
+com.realtek.kara
+com.realtek.karaoke.userguide
+com.konka.yimultiscreentv                       # Konka's own screen-mirroring app
+com.realtek.miracast
+
+# === Other optional features - owner's choice: all off ===
+com.google.android.apps.tv.dreamx               # ambient screensaver; launcher's Clock screensaver set first
+com.google.android.katniss                      # Assistant/voice search; the mic button stops working
+com.google.android.play.games
+com.google.android.apps.mediashell              # Chromecast built-in / phone casting
+
+# === Stock launcher and setup wizard. Do this LAST, after the new launcher is installed and registered. ===
+com.google.android.tungsten.setupwraith         # RecoveryActivity otherwise takes over Home
+com.google.android.apps.tv.launcherx
