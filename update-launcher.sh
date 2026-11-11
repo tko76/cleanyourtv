@@ -26,6 +26,7 @@ TV_REGISTRY=(
     "sony65:10.44.0.96:themes/ruska"
     "tcl:10.44.0.98:examples/tcl-g03-google-tv"
     "sony75:10.44.0.87:themes/ruska"
+    "chromecast-workshop:10.44.0.88:"
 )
 
 # ── APK registry ───────────────────────────────────────────────────────────────
@@ -47,7 +48,10 @@ APK_REGISTRY=(
 # ── Debloat map ────────────────────────────────────────────────────────────────
 # TV name → debloat list (relative to repo root).
 # Run with --debloat to apply; safe to re-run (already-disabled packages skipped).
-# Both TVs are on Ethernet so FORCE_SETUPWRAITH=1 is always safe here.
+# The three above are on Ethernet so FORCE_SETUPWRAITH=1 is always safe here.
+# chromecast-workshop is on Wi-Fi and deliberately left out of this map: run its debloat by hand with
+# plain `tools/disable.sh` (no FORCE_SETUPWRAITH) so the script's own Wi-Fi-network-ownership check can
+# skip setupwraith safely instead of this script's blanket FORCE_SETUPWRAITH=1 risking the saved network.
 declare -A DEBLOAT_MAP
 DEBLOAT_MAP["sony65"]="debloat-sony-vh2-uc.txt"
 DEBLOAT_MAP["tcl"]="debloat-tcl-g03.txt"

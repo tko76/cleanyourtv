@@ -69,6 +69,21 @@
 # broken in daily use (owner's report).
 # The commented "one day" group at the end was disabled four days later and has only had a day so far.
 
+# The gear (Settings) button on this BRAVIA_VH2_UC build (second unit): logcat during a real remote
+# press shows com.android.server.policy.PhoneWindowManager.interceptKeyBeforeDispatching calling Sony's
+# own setPictureOn() and broadcasting straight to com.android.systemui's QuickUiModule
+# (handleQuickSettingsKey), which opens Sony's native brightness/picture quick-settings bar. No
+# AccessibilityManager/filter-key-events call and nothing naming com.gathin.tvhome appears in that
+# trace, confirming the key is fully consumed inside Sony's vendor PhoneWindowManager fork before it
+# ever becomes a dispatchable KeyEvent or an ACTION_SETTINGS intent. HomeKeyService is bound correctly
+# (dumpsys accessibility shows capabilities=8, CAPABILITY_CAN_FILTER_KEY_EVENTS) but never gets a
+# chance. settings_key_panel, settings_key_keycodes, settings_key_scancodes and app_keys all depend on
+# the key reaching the accessibility filter or an Activity intent, so none of them can redirect this
+# button on this build - unlike the BRAVIA VU3 (#2131, docs/TROUBLESHOOTING.md), where the same button
+# launches a normal Settings.ACTION_SETTINGS activity that IS interceptable. Not tried: whether a later
+# firmware build changes this, or whether a different physical button sends a distinguishable scancode
+# before the framework translates it to KEYCODE_SETTINGS.
+
 # Fourth unit, EU M variant: hardware SKU XR-65A83J, product BRAVIA_VH2_M_EU, Android 12/API 31,
 # build BRAVIA_VH2_M_EU-user 12 STT2.230505.001.S136 682241. This unit behaved like the UC/PA units
 # for Home handover: after the replacement launcher was installed, setupwraith and launcherx were both
