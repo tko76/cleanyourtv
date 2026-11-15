@@ -54,8 +54,9 @@ com.realtek.leanbacklauncher.partnercustomizer  # only feeds the stock launcher'
 com.realtek.retailmode                          # store demo mode
 com.konka.livewallpaper                         # packaged as "KonkaRetailMode" despite the id
 com.vewd.core.service                           # Vewd HbbTV/operator-app engine; unused (US, no HbbTV)
-com.cltv.mal                                    # Common Live TV content/metadata service (Anoki-adjacent)
 com.cltv.hybrid                                 # Common Live TV hybrid broadcast app
+# com.cltv.mal is MediaTek's MAL middleware (TV service/agent/input core): tools/disable.sh refuses to
+# touch it (#1578, a Haier H50H5F boot-looped with it off). Left enabled, not added here.
 
 # === Not needed on a TV ===
 com.android.healthconnect.controller

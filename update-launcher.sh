@@ -73,6 +73,8 @@ for arg in "$@"; do
         UPDATE_APPS=1
     elif [ "$arg" = "--debloat" ]; then
         RUN_DEBLOAT=1
+    elif [ "$arg" = "--all" ]; then
+        WANT_ALL=1
     else
         WANTED["${arg#--}"]=1
         WANT_ALL=0
