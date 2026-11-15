@@ -10,7 +10,7 @@ android {
         applicationId 'io.github.luyzfernando08.sleeptimer'
         minSdk 28   // GLOBAL_ACTION_LOCK_SCREEN, which puts the TV to sleep, is Android 9
         targetSdk 34
-        versionCode 1
+        versionCode 2
         versionName '1.0'
     }
 
