@@ -49,16 +49,14 @@ APK_REGISTRY=(
 # ── Debloat map ────────────────────────────────────────────────────────────────
 # TV name → debloat list (relative to repo root).
 # Run with --debloat to apply; safe to re-run (already-disabled packages skipped).
-# The three above are on Ethernet so FORCE_SETUPWRAITH=1 is always safe here.
-# chromecast-workshop is on Wi-Fi and deliberately left out of this map: run its debloat by hand with
-# plain `tools/disable.sh` (no FORCE_SETUPWRAITH) so the script's own Wi-Fi-network-ownership check can
-# skip setupwraith safely instead of this script's blanket FORCE_SETUPWRAITH=1 risking the saved network.
+# Sony/TCL entries are Ethernet, so FORCE_SETUPWRAITH=1 is safe for those targets.
+# Wi-Fi devices (Chromecast and Sylvox) are deliberately left out: run their debloat by hand without FORCE so
+# tools/disable.sh can preserve the setup-owned Wi-Fi network instead of dropping ADB.
 declare -A DEBLOAT_MAP
 declare -A ADDON_MAP
 DEBLOAT_MAP["sony65"]="debloat-sony-vh2-uc.txt"
 DEBLOAT_MAP["tcl"]="debloat-tcl-g03.txt"
 DEBLOAT_MAP["sony75"]="debloat-sony-vh2-uc.txt"
-DEBLOAT_MAP["sylvox-outdoor"]="debloat-sylvox-outdoor.txt"   # on Ethernet too; FORCE_SETUPWRAITH=1 safe
 ADDON_MAP["sylvox-outdoor"]="sleep-timer"                    # weekly wake/sleep schedule card
 # ──────────────────────────────────────────────────────────────────────────────
 FORK=tko76/cleanyourtv
