@@ -28,6 +28,7 @@ TV_REGISTRY=(
     "sony75:10.44.0.87:themes/ruska"
     "chromecast-workshop:10.44.0.88:"
     "sylvox-outdoor:10.44.0.245:themes/sylvox-outdoor"
+    "sylvox-indoor:FILL_IN_IP:themes/sylvox-outdoor"
 )
 
 # ── APK registry ───────────────────────────────────────────────────────────────
@@ -58,6 +59,7 @@ DEBLOAT_MAP["sony65"]="debloat-sony-vh2-uc.txt"
 DEBLOAT_MAP["tcl"]="debloat-tcl-g03.txt"
 DEBLOAT_MAP["sony75"]="debloat-sony-vh2-uc.txt"
 ADDON_MAP["sylvox-outdoor"]="menu-display"
+ADDON_MAP["sylvox-indoor"]="menu-display"
 # ──────────────────────────────────────────────────────────────────────────────
 FORK=tko76/cleanyourtv
 BRANCH=main
