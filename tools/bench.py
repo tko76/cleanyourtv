@@ -16,9 +16,16 @@ TCP with the adb_shell library, so no adb binary is needed. That matters on macO
 platform tools are not installed by default.
 
 Usage:
-    TV_HOST=192.168.1.50 python tools/bench.py --keys 36 --series 3
-    TV_HOST=192.168.1.50 python tools/bench.py --keys 36 --series 3 --out-dir my-results
-    TV_HOST=192.168.1.50 python tools/bench.py --app org.videolan.vlc/.StartActivity
+    TV_HOST=192.168.1.50 tools/venv/bin/python -I tools/bench.py --keys 36 --series 3
+    TV_HOST=192.168.1.50 tools/venv/bin/python -I tools/bench.py --keys 36 --series 3 --out-dir my-results
+    TV_HOST=192.168.1.50 tools/venv/bin/python -I tools/bench.py --app org.videolan.vlc/.StartActivity
+
+The venv's Python is the one tools/requirements.txt installs adb_shell into, and the lines above name
+it rather than a bare `python`. Started with another Python this script runs again under the venv's
+one, which rescues the packages but not the name of the interpreter - `python` on its own is a command
+neither a stock Ubuntu 24.04 nor macOS has, so the line it used to print answered `command not found`
+(exit 127) before anything was read. docs/workflows/perf-ab.md and the other tools' headers already
+name the venv this way.
 
 --app names the app the cold start and the return to Home leave Home for. Without it, the TV's
 Settings, else the first leanback app that is not the launcher.
@@ -47,6 +54,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import stat
 import statistics
 import sys
@@ -431,6 +439,67 @@ def restore_accessibility(tv, package, services):
     if added:
         tv.shell("settings put secure enabled_accessibility_services " + ":".join(merged))
         tv.shell("settings put secure accessibility_enabled 1")
+        time.sleep(2)  # the system binds a newly listed service within a second or so
+    # Listed is not the same as bound. On a TCL 43C645 (Smart TV Pro, G03_4K_GB, Android 11) the
+    # force-stop takes HomeKeyService off the list, the write above puts it back, and the system still
+    # does not bind it: the remote's app buttons stayed dead after a run until tools/theme.sh was
+    # pushed again. Where accessibility is switched off the helper is not meant to be bound, so that
+    # is left alone.
+    if tv.shell("settings get secure accessibility_enabled", retry=True).strip() != "1":
+        return
+    if unbound_helpers(tv, package, services):
+        rebind_accessibility(tv, merged)
+
+
+def unbound_helpers(tv, package, services):
+    """The services of `services` that the system has not bound, as Activity Manager reports them.
+
+    tools/theme_restart.py already reads a completed binding out of `dumpsys activity services`,
+    by component rather than by the localised label `dumpsys accessibility` prints, so this asks it.
+    """
+    here = str(Path(__file__).resolve().parent)
+    if here not in sys.path:
+        sys.path.insert(0, here)
+    import theme_restart
+    user = tv.shell("am get-current-user", retry=True).strip()
+    user = int(user) if user.isdecimal() else 0
+    bound = theme_restart.bound_services(
+        tv.shell(f"dumpsys activity services {package}", retry=True), user)
+    return [service for service in services
+            if not theme_restart.components(_norm_component(service)).keys() <= bound]
+
+
+REBIND_DONE = "__CYT_REBIND_DONE__"
+
+
+def rebind_accessibility(tv, merged):
+    """Make the system bind the listed services again: empty the list, wait, write it back.
+
+    Android binds an accessibility service when the list changes, so the same value written over
+    itself does nothing. tools/theme_restart.py does this after every theme push, with the
+    two-second gap a TCL G05 needs (#994). It is one command with a trap, so the TV puts the list
+    back on its own if the connection drops in the gap: a host-side sleep could leave every
+    accessibility service on the set switched off.
+
+    The two writes that put things back are chained with `&&`, the trap is only cleared once both
+    went through, and the command ends by printing REBIND_DONE: `tv.shell()` hands back the output
+    and not the TV shell's exit status, as theme_restart.py's own marker works around. Without the
+    marker the restore did not finish (the trap tries once more on its way out), so this raises
+    rather than letting a run end with the key helpers off the list.
+    """
+    put = "settings put secure"
+    restore = (f"{put} enabled_accessibility_services {shlex.quote(':'.join(merged))} && "
+               f"{put} accessibility_enabled 1")
+    out = tv.shell(f"cyt_restore() {{ {restore}; }}; trap cyt_restore EXIT; "
+                   "trap 'cyt_restore; exit 1' HUP INT TERM; "
+                   f"{put} enabled_accessibility_services ''; {put} accessibility_enabled 0; sleep 2; "
+                   f"cyt_restore && trap - EXIT HUP INT TERM && echo {REBIND_DONE}")
+    if REBIND_DONE not in out.split():
+        raise RuntimeError(
+            "The key helpers could not be put back on the accessibility list after the cold start "
+            "(the TV refused the write, or its answer was lost). The remote's app buttons may do "
+            "nothing until the theme is pushed again with tools/theme.sh, or the helpers are "
+            "switched on in Settings > Accessibility.")
 
 
 def cold_start(tv, component, repeats):
@@ -528,7 +597,8 @@ def idle_cpu(tv, package, seconds):
         for line in lines:
             if line.startswith("cpu "):
                 fields = [int(x) for x in line.split()[1:]]
-                return (sum(fields), fields[3] + fields[4])
+                # guest and guest_nice are already included in user and nice.
+                return (sum(fields[:8]), fields[3] + fields[4])
         return None
 
     def process_ticks(lines, pid):

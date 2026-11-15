@@ -39,6 +39,20 @@ the table did not carry, so the ninth page sat outside the rule: a press sweep t
 this one stayed green, which is what the Uzbek paragraph above describes for the seventh. The month table
 gains the French names; the pin and the reader tests name the page.
 
+README.es.md, added with the Spanish translation (673c4723), closes it with "(datos del 9 de noviembre de
+2026)" and was read the same way again: "noviembre" is not "novembro", so the Spanish page's date parsed to
+nothing and the page sat outside the rule the other eight are held to. The month table gains the Spanish
+names; the pin and the reader tests name the page.
+
+README.he.md, added with the Hebrew translation (4af8a7ee), was the one page outside even that: its coverage
+sentence ended at the press link with no parenthetical at all, where the pages above close theirs with the day
+their numbers were read, so a reader of that page was given 546 articles and 673 videos with no day on them
+and a sweep could move the numbers without anything noticing. Its date is also written the way a Hebrew date
+writes one - the month carries the ב prefix, "נכון ל־14 בנובמבר 2026" - which the month table did not carry, so
+a parenthetical added there alone would still have parsed to nothing. The page closes its coverage sentence
+with that parenthetical now, the table gains the prefixed Hebrew month names, and the pin and the reader tests
+name the page like the nine above it.
+
 Run from the repository root: python3 -m unittest discover -s tests -v
 """
 import re
@@ -61,7 +75,9 @@ ARTICLE_MONTHS = {name: number for number, name in enumerate(
 
 # The month names a page in each language can date the numbers with, spelled the way a date spells them:
 # German "31. Oktober", Ukrainian "31 жовтня" (genitive), Turkish "31 Ekim", Portuguese "31 de outubro",
-# Uzbek "31-oktabr" (README.uz.md writes the day and the month joined by a hyphen), French "9 novembre".
+# Uzbek "31-oktabr" (README.uz.md writes the day and the month joined by a hyphen), French "9 novembre",
+# Spanish "9 de noviembre" (README.es.md, which is not the Portuguese "novembro") and Hebrew "14 בנובמבר"
+# (README.he.md, where the month carries the ב prefix a Hebrew date puts in front of it).
 MONTHS = (
     ("January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
      "November", "December"),
@@ -79,11 +95,16 @@ MONTHS = (
      "dekabr"),
     ("janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre",
      "novembre", "décembre"),
+    ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre",
+     "noviembre", "diciembre"),
+    # Hebrew writes the month of a date with the ב prefix in front of its name: "14 בנובמבר 2026".
+    ("בינואר", "בפברואר", "במרץ", "באפריל", "במאי", "ביוני", "ביולי", "באוגוסט", "בספטמבר", "באוקטובר",
+     "בנובמבר", "בדצמבר"),
 )
 
 
 def month_numbers():
-    """{month name, casefolded: its number}, the eight languages the front pages are written in."""
+    """{month name, casefolded: its number}, the nine languages the front pages are written in."""
     out = {}
     for names in MONTHS:
         for number, name in enumerate(names, 1):
@@ -110,8 +131,8 @@ def story_paragraph(text):
 def date_clause(text):
     """The parenthetical that follows the press link in the story paragraph, or None.
 
-    Only the text just after the link is read. A page may write "as of" elsewhere in the story - the
-    Hebrew one dates the stars it had on 30 October in the sentence before - and that is not this date.
+    Only the text just after the link is read. A page may date something else in the story - README.he.md
+    dates the stars it had on 30 October in the sentence before - and that is not this date.
     """
     paragraph = story_paragraph(text)
     if paragraph is None:
@@ -196,7 +217,7 @@ def stale_pages(root=ROOT, press=None):
 
 
 class TreeTest(unittest.TestCase):
-    """The eight pages on main today, and the day their numbers were counted."""
+    """The ten pages on main today, and the day their numbers were counted."""
 
     def test_no_page_dates_the_press_numbers_before_the_newest_article(self):
         behind = stale_pages()
@@ -208,8 +229,8 @@ class TreeTest(unittest.TestCase):
 
     def test_the_pages_that_date_the_numbers_today(self):
         self.assertEqual(
-            {"README.md", "README.de.md", "README.fr.md", "README.nl.md", "README.pt-BR.md", "README.tr.md",
-             "README.uk.md", "README.uz.md"},
+            {"README.md", "README.de.md", "README.es.md", "README.fr.md", "README.he.md", "README.nl.md",
+             "README.pt-BR.md", "README.tr.md", "README.uk.md", "README.uz.md"},
             {name for name, _ in dated_pages()},
             "the front pages that close the coverage sentence with a date; a translation that copies the "
             "clause is read without being added here, and one that stops dating its numbers is a change")
@@ -228,14 +249,16 @@ class ReaderTest(unittest.TestCase):
 
     def test_each_page_s_clause_parses_to_its_own_day(self):
         expected = {
-            "README.md": (2026, 11, 9),
-            "README.de.md": (2026, 11, 9),
-            "README.fr.md": (2026, 11, 9),
-            "README.nl.md": (2026, 11, 9),
-            "README.uk.md": (2026, 11, 9),
-            "README.tr.md": (2026, 11, 9),
-            "README.pt-BR.md": (2026, 11, 9),
-            "README.uz.md": (2026, 11, 9),
+            "README.md": (2026, 11, 14),
+            "README.de.md": (2026, 11, 14),
+            "README.es.md": (2026, 11, 14),
+            "README.fr.md": (2026, 11, 14),
+            "README.he.md": (2026, 11, 14),
+            "README.nl.md": (2026, 11, 14),
+            "README.uk.md": (2026, 11, 14),
+            "README.tr.md": (2026, 11, 14),
+            "README.pt-BR.md": (2026, 11, 14),
+            "README.uz.md": (2026, 11, 14),
         }
         for name, date in expected.items():
             text = (ROOT / name).read_text(encoding="utf-8")
@@ -251,12 +274,14 @@ class ReaderTest(unittest.TestCase):
             ("dados de 31 de outubro de 2026", (2026, 10, 31)),
             ("raqamlar 2026-yil 31-oktabr holatiga", (2026, 10, 31)),
             ("chiffres au 31 octobre 2026", (2026, 10, 31)),
+            ("datos del 31 de octubre de 2026", (2026, 10, 31)),
+            ("המספרים נכון ל־31 באוקטובר 2026", (2026, 10, 31)),
         ):
             self.assertEqual(date, clause_date(clause), clause)
 
     def test_a_page_that_dates_something_else_is_not_read(self):
-        # README.he.md's story opens "נכון ל־30 באוקטובר 2026" about its star count and closes on the
-        # press link with no parenthetical: no date of the press numbers, so nothing to hold.
+        # A story that dates its star count in the sentence before and closes on the press link with no
+        # parenthetical is dating something else, not the press numbers: nothing to hold.
         text = ("# CleanYourTV\n\nנכון ל־30 באוקטובר 2026 הוא צבר יותר מ־46 אלף כוכבים.\n"
                 "סיקור בתקשורת: 412 כתבות ו־229 סרטונים ב־YouTube. [docs/PRESS.md](docs/PRESS.md)\n\n## Contributing\n")
         self.assertIsNone(date_clause(text))

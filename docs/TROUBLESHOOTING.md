@@ -136,7 +136,10 @@ Things that bit us or contributors, so they don't bite you. Commands use `tools/
   ping-discovery probe fail outright ("Network is down", SO_ERROR 50) before it scans anything;
   `nmap -sT -Pn` (a plain TCP connect scan, no ping, no raw sockets) or the Python loop above still
   works there. Every script here honours `TV_PORT`, and
-  the closing check is `tools/adb-closed.py <tv ip> <port>`.
+  the closing check is `tools/adb-closed.py <tv ip> <port>`. Not every port that answers is ADB: a
+  Philips keeps its JointSpace API open on 1926, and 1925 on older sets, whatever the debugging toggles
+  say (`tools/philips-api.py` reads the API there), so `tools/adb-closed.py <tv ip> 1925` reports that
+  port as open, not as network ADB - the tool says which port it checked, and 5555 is the one to close.
 - **Close port 5555 when you're done**: plaintext, and a shell for anyone on the LAN when `ro.adb.secure=0`, or when it is unset on a debug build or Android 4.4 (`tools/disable.sh` warns about both). Steps in the README FAQ.
 - **The TV sits on a separate VLAN or IoT network** and `tools/tv.py` times out although debugging
   is on: the router keeps the computer from reaching it. Add a temporary firewall rule from your
@@ -612,6 +615,26 @@ Things that bit us or contributors, so they don't bite you. Commands use `tools/
   test app does not count as something else: on a Xiaomi Mi TV 4A
   `com.duokan.factorytest/.FactoryLauncher` answers HOME, so the guard leaves it out, along with any
   package named `*factorytest*`, `*factory_test*` or `*factorymode*`.
+- **The install stops at `Home currently resolves to '<package>', which is not a stock launcher this
+  script knows`**, seen on an Allwinner-based "Z1 4K" (Android 11,
+  [#3471](https://github.com/Gathin23/cleanyourtv/issues/3471)). `launcher/build-and-install.sh` asks
+  the TV which app owns Home and turns off only one of the four it recognises (README, "How the
+  scripts protect Home"), because the answer can also be Android's chooser, a setup wizard, or
+  another launcher, and none of those should be disabled by accident. Two answers turn up in
+  practice: a vendor setup stub that still owns Home, `com.softwinner.provision` on that box, and
+  Google TV's `com.google.android.tungsten.setupwraith`, which the script's own message names and
+  which answers HOME ahead of a launcher that is not Home yet. Finish or skip the TV's own setup so
+  the stub stops answering HOME, list the candidates with
+  `tools/tv.py 'cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME'`,
+  then run the installer again naming the package it should turn off:
+  `STOCK_LAUNCHER=com.google.android.tvlauncher launcher/build-and-install.sh` (`-StockLauncher` with
+  the `.ps1`), or `STOCK_LAUNCHER=none` to leave every launcher on, which keeps the stock launcher as
+  Home (`stock_home_redirect`). A wrong guess is recoverable: after the install the script reads where
+  Home ended up and enables the package it was told to disable when the new launcher is not Home,
+  leaving those commands in a `cleanyourtv-handover-<address>.txt` when it cannot confirm the handover
+  came back. Nothing here needs the wizard disabled: the install only needs Home answered by a
+  launcher, and a list that carries a `setupwraith` line is applied with that line skipped while the
+  saved Wi-Fi network belongs to it (`FORCE_SETUPWRAITH=1` overrides on Ethernet).
 - **The TV no longer boots after a list that disabled Android's core packages** (original Mi TV
   Stick, [#884](https://github.com/Gathin23/cleanyourtv/issues/884)). An agent's list took
   `com.google.android.permissioncontroller`, `com.google.android.packageinstaller`,
@@ -626,6 +649,14 @@ Things that bit us or contributors, so they don't bite you. Commands use `tools/
   middleware: `com.cltv.mal`, `com.mediatek.tis`, `com.mediatek.tv.service` and
   `com.mediatek.tv.agent` (the bullet below). The three tools say "core Android or TV middleware
   packages" in that message, so a run that refuses one of the four reads the same way as this one.
+  Android's sdk sandbox is one package that reads like bloat and is not: an AOSP build ships
+  `com.android.sdksandbox`, a Google GMS image `com.google.android.sdksandbox` (`SdkSandboxGoogle.apk`).
+  Android will not finish booting without exactly one of them and says so in logcat —
+  `java.lang.RuntimeException: There should exactly one sdk sandbox package; found 0` from
+  `PackageManagerService.getRequiredSdkSandboxPackageName` — so a list that disables either name leaves
+  the set on the boot animation, with nothing on screen saying why
+  ([#3881](https://github.com/Gathin23/cleanyourtv/issues/3881), on the Android TV 16 / API 36 emulator
+  image). Read a list for both names before applying it.
   If a set is already stuck and still answers ADB, `pm enable` each of those packages and reboot;
   if ADB is gone too, a factory reset from the recovery menu is usually the only way back.
 - **The TV restarts in a loop after a debloat**, seen once, on a Haier H50H5F (Google TV 14,
@@ -792,8 +823,22 @@ Things that bit us or contributors, so they don't bite you. Commands use `tools/
   minutes right after power-on and run `pm enable com.cvte.tv.launcher.space` and
   `settings put secure enabled_accessibility_services ""` if it answers (a phone hotspot with the old
   network's name and password stands in for a missing router); wipe the cache partition from the recovery
-  menu. A factory reset also works but erases everything, so it comes last. The prompt now keeps the stock
-  launcher enabled on CVTE boards without a tested list.
+  menu. A factory reset also works but erases everything, so it comes last.
+  The same state came one step earlier on a NOVA 32" (CVTE `Hi3751V350`, Android 14, build
+  `20241015_034630`): `com.cvte.tv.launcher.space` was disabled and FLauncher
+  (`me.efesser.flauncher`) set as Home, and a power cut landed during the reboot that would have
+  applied the two. The panel stays on the animated `WISDOM SHARE smart cloud tv` logo with the
+  network never coming up, so the `adb connect` above answers nothing at all, and the combinations
+  the report tried - Power held 30 s, SOURCE and MENU on the remote, Power together with the
+  remote's Power, F12/F2/Del/Esc, Shift or Ctrl held from power-on - all left it there. No pinhole
+  RESET or SERVICE button is on the set either, and Ctrl+Alt+Del on a USB keyboard reboots it, which
+  is how the kernel and USB input were shown to be alive. Whether the cut finished a boot that would
+  have succeeded, the report cannot say. No recovery combination for a `Hi3751V350` with a single
+  power button has been posted ([#2516](https://github.com/Gathin23/cleanyourtv/issues/2516)), and
+  the factory menu that session had enabled ADB from - `MENU`, then `1147`, then `DEBUG`, as
+  [`examples/sankey-smart-tv-hi3751v350/README.md`](../examples/sankey-smart-tv-hi3751v350/README.md)
+  has it on the same SoC - is drawn by the running TV, so it is no way back in either.
+  The prompt therefore keeps the stock launcher enabled on CVTE boards without a tested list.
 - **Accounts & profiles is empty after the stock launcher is disabled** (TCL 75C845X2, `G08_4K_GB`,
   Google TV 14, [#304](https://github.com/Gathin23/cleanyourtv/discussions/304)). The accounts are still
   there (`dumpsys account` lists them); the page lives in `com.google.android.apps.tv.launcherx`, and while
@@ -1254,7 +1299,9 @@ turned off in Settings stays off.
   `INPUT_KEY_SERVICE=1` and press the real button.
   A press that `logcat` reports as `KEY_UNKNOWN` or `KEY_PROGRAM` cannot be matched by keycode at all,
   because every unmapped button shares those codes: use the Linux scancode from
-  `tools/tv.py 'getevent -lt'` in `settings_key_scancodes` and install with `HOME_KEY_SERVICE=1`
+  `tools/tv.py 'getevent -t'` in `settings_key_scancodes` - the hex number after `0001` on the press's
+  line, in decimal (`00f0` is 240), since `-l` prints the key's name in place of that number - and
+  install with `HOME_KEY_SERVICE=1`
   (an RC-36 remote sends its gear on scancode 240 and its notifications button on 362 that way; see
   [the FPD CG50-C3 note](devices/fpd-cg50-c3.md)).
   Not every set answers those two routes, though ([#853](https://github.com/Gathin23/cleanyourtv/issues/853),
@@ -1279,7 +1326,7 @@ turned off in Settings stays off.
   from the shell, so nothing there said which keycode it becomes. `139` in `settings_key_keycodes` did nothing (the report
   took it for `KEYCODE_F8`, which is `138`; `138` was not tried); `66`, the `input-event-codes.h` number for `KEY_F8`, in
   `settings_key_scancodes` opened the launcher's panel with `settings_key_panel`. So read both numbers
-  off one `getevent -lt` press and try the `EV_KEY` one when the `MSC_SCAN` one matches nothing. That
+  off one `getevent -t` press and try the `EV_KEY` one when the `MSC_SCAN` one matches nothing. That
   board also brings the stock launcher back within minutes of `pm disable-user` (the
   `com.xgimi.xrmservice` bullet above), and while it is on, the gear and Home open Google TV.
 - **All vendor buttons die at once** and `logcat` says `GLOBAL_BUTTON ... process is bad`: the
@@ -1290,8 +1337,8 @@ turned off in Settings stays off.
   button makes OEM broadcast receivers (such as Xiaomi's `com.xiaomi.android.tvsetup.partnercustomizer/.GlobalKeyReceiver`)
   launch a market intent to install the missing package, or crash repeatedly.
   To remap it cleanly, put its hardware scancode in `app_keys`: `"scan:<scancode>:<package>"` (e.g.
-  `"scan:399:org.smarttube.stable"` on the Xiaomi Mi Box S, read from `getevent -lt`) and rebuild with
-  `INPUT_KEY_SERVICE=1`.
+  `"scan:399:org.smarttube.stable"` on the Xiaomi Mi Box S, the hex number after `0001` on a
+  `getevent -t` press in decimal: `018f` is 399) and rebuild with `INPUT_KEY_SERVICE=1`.
   **Use the scancode form (`scan:<scancode>`) rather than a raw keycode (`191`):** generic button keycodes
   like `KEYCODE_BUTTON_4` (191) may be shared with other buttons on some remotes/key layouts, so mapping by keycode
   can unintentionally hijack other buttons.
@@ -1310,8 +1357,8 @@ turned off in Settings stays off.
   entry should put it back (read from the launcher's code, not yet tried on a set), because a `scan:` entry is
   answered before the settings branch in
   `HomeKeyService.onKeyEvent`: `"scan:<scancode>:com.sony.dtv.smartui/.settings.SmartSettingsActivity"` in
-  `config.xml`, or in a theme's `app_keys` (find `<scancode>` with `getevent -lt` while pressing the button,
-  as the `scan:` bullet above does for a Sony remote). A keycode entry, `"176:..."` (`KEYCODE_SETTINGS`), is
+  `config.xml`, or in a theme's `app_keys` (find `<scancode>` with `getevent -t` while pressing the button,
+  in decimal, as the `scan:` bullet above says). A keycode entry, `"176:..."` (`KEYCODE_SETTINGS`), is
   also answered before the settings branch, when it has a tap target: a `hold:176:...` entry alone leaves the tap
   to Settings, and a button listed in `settings_key_scancodes` stays Settings (read from the launcher's code, not
   yet tried on a set).

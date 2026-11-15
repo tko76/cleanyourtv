@@ -31,4 +31,8 @@
 - Docs and the README stay in step: a new list gets its `tv.json` (the TV tables are generated from it), and a
   theme, add-on or tool its row where the others are.
 
-Then run the tests: `python3 -m unittest discover -s tests -v`.
+Then run the tests with the checkout's venv: `tools/venv/bin/python -m unittest discover -s tests -v`.
+[`README.md`'s by-hand block](../../README.md) builds it, and it is where `tools/requirements.txt` puts the
+`adb_shell` the suite imports - under the system `python3` those checks skip and the run still says OK. The
+picture, card and wallpaper checks need Pillow as well: `tools/requirements-perf.txt` adds it, and without it
+they are reported as skips, not failures.
