@@ -287,10 +287,18 @@ install_tv() {
         else
             echo "    [$name] WARNING: Menu Display update failed: $install_out"
         fi
-        # Grant file access to USB storage volumes.
+        # Grant file access to USB storage volumes and background-launch permission.
         adb -s "$ip:5555" shell appops set "$pkg" MANAGE_EXTERNAL_STORAGE allow 2>/dev/null || true
         adb -s "$ip:5555" shell appops set "$pkg" READ_MEDIA_IMAGES allow 2>/dev/null || true
+        # SYSTEM_ALERT_WINDOW is the Android 12+ BAL exception that lets BootReceiver startActivity().
+        adb -s "$ip:5555" shell appops set "$pkg" SYSTEM_ALERT_WINDOW allow 2>/dev/null || true
         adb -s "$ip:5555" shell appops write-settings 2>/dev/null || true
+        # Android marks a freshly-installed package as "stopped" until it is launched once from the
+        # UI. BOOT_COMPLETED is not delivered to stopped apps, so clear the flag now by launching
+        # and immediately backing out — this must happen AFTER every install.
+        adb -s "$ip:5555" shell am start -n "$pkg/.MenuActivity" 2>/dev/null || true
+        sleep 2
+        adb -s "$ip:5555" shell input keyevent KEYCODE_BACK 2>/dev/null || true
     fi
     done
 

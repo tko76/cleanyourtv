@@ -6,6 +6,12 @@
     <!-- Needed for direct File access on external volumes (Android 11+); granted via ADB. -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!--
+      SYSTEM_ALERT_WINDOW: on Android 12+ this is one of the Background Activity Launch (BAL)
+      exceptions, which allows the BootReceiver to call startActivity(). Granted via appops after
+      install; we never actually draw an overlay window.
+    -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
