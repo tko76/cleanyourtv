@@ -27,7 +27,7 @@ jobs:
       - name: Build release APK
         working-directory: launcher
         env:
-          KEYSTORE_PATH: /tmp/tvhome-release.jks
+          KEYSTORE_PATH: /tmp/launcher-release.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -42,6 +42,11 @@ jobs:
           retention-days: 7
       - name: Build Sleep Timer APK
         working-directory: addons/sleep-timer
+        env:
+          KEYSTORE_PATH: /tmp/launcher-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon assembleRelease

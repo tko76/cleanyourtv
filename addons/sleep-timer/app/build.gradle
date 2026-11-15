@@ -14,12 +14,25 @@ android {
         versionName '1.0'
     }
 
+    def ksFile = System.getenv('KEYSTORE_PATH') ? file(System.getenv('KEYSTORE_PATH')) : null
+    def useStableKey = ksFile?.exists()
+    if (useStableKey) {
+        signingConfigs {
+            release {
+                storeFile ksFile
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
-            // Sideloaded over ADB, never published.
-            signingConfig signingConfigs.debug
+            // Use the repository's stable CI key so schedule updates install in place.
+            signingConfig useStableKey ? signingConfigs.release : signingConfigs.debug
         }
     }
 

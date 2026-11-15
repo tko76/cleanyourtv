@@ -27,7 +27,7 @@ TV_REGISTRY=(
     "tcl:10.44.0.98:examples/tcl-g03-google-tv"
     "sony75:10.44.0.87:themes/ruska"
     "chromecast-workshop:10.44.0.88:"
-    "sylvox-outdoor:10.44.0.244:"
+    "sylvox-outdoor:10.44.0.245:"
 )
 
 # ── APK registry ───────────────────────────────────────────────────────────────
@@ -54,10 +54,12 @@ APK_REGISTRY=(
 # plain `tools/disable.sh` (no FORCE_SETUPWRAITH) so the script's own Wi-Fi-network-ownership check can
 # skip setupwraith safely instead of this script's blanket FORCE_SETUPWRAITH=1 risking the saved network.
 declare -A DEBLOAT_MAP
+declare -A ADDON_MAP
 DEBLOAT_MAP["sony65"]="debloat-sony-vh2-uc.txt"
 DEBLOAT_MAP["tcl"]="debloat-tcl-g03.txt"
 DEBLOAT_MAP["sony75"]="debloat-sony-vh2-uc.txt"
 DEBLOAT_MAP["sylvox-outdoor"]="debloat-sylvox-outdoor.txt"   # on Ethernet too; FORCE_SETUPWRAITH=1 safe
+ADDON_MAP["sylvox-outdoor"]="sleep-timer"                    # weekly wake/sleep schedule card
 # ──────────────────────────────────────────────────────────────────────────────
 FORK=tko76/cleanyourtv
 BRANCH=main
@@ -132,8 +134,9 @@ if [ "$STATUS" != "success" ]; then
 fi
 
 TMPDIR=/tmp/launcher-update-$$
-mkdir -p "$TMPDIR/launcher"
+mkdir -p "$TMPDIR/launcher" "$TMPDIR/addons/sleep-timer"
 gh run download --repo "$FORK" "$RUN_ID" --name launcher-release --dir "$TMPDIR/launcher"
+gh run download --repo "$FORK" "$RUN_ID" --name sleep-timer-release --dir "$TMPDIR/addons/sleep-timer"
 
 # ── Resolve APK sources ────────────────────────────────────────────────────────
 # Downloads each APK once to TMPDIR; records the local path per registry name.
@@ -251,6 +254,29 @@ install_tv() {
 
     # Disable package verification for sideloaded APKs, restore when done.
     adb -s "$ip:5555" shell settings put global verifier_verify_adb_installs 0 2>/dev/null || true
+
+    # Per-TV launcher add-ons.
+    addon="${ADDON_MAP[$name]+${ADDON_MAP[$name]}}"
+    if [ "$addon" = "sleep-timer" ]; then
+        pkg="io.github.luyzfernando08.sleeptimer"
+        svc="$pkg/$pkg.SleepService"
+        echo "    [$name] Installing Sleep Timer schedule module..."
+        adb -s "$ip:5555" push "$TMPDIR/addons/sleep-timer/app-release.apk" /data/local/tmp/sleeptimer.apk
+        install_out=$(adb -s "$ip:5555" shell pm install -r /data/local/tmp/sleeptimer.apk 2>&1 || true)
+        if echo "$install_out" | grep -q "Success"; then
+            echo "    [$name] Sleep Timer installed."
+        else
+            echo "    [$name] WARNING: Sleep Timer update failed: $install_out"
+        fi
+        if adb -s "$ip:5555" shell pm list packages "$pkg" | grep -q "^package:$pkg$"; then
+            adb -s "$ip:5555" shell "s=\$(settings get secure enabled_accessibility_services); case :\$s: in *:$svc:*) ;; *) if [ -z \"\$s\" ] || [ \"\$s\" = null ]; then s=$svc; else s=\$s:$svc; fi; settings put secure enabled_accessibility_services \$s;; esac; settings put secure accessibility_enabled 1"
+            adb -s "$ip:5555" shell appops set "$pkg" SYSTEM_ALERT_WINDOW allow 2>/dev/null || true
+            adb -s "$ip:5555" shell appops set "$pkg" SCHEDULE_EXACT_ALARM allow 2>/dev/null || true
+            adb -s "$ip:5555" shell appops set "$pkg" AUTO_START allow 2>/dev/null || true
+            adb -s "$ip:5555" shell appops set "$pkg" APP_AUTO_START allow 2>/dev/null || true
+            adb -s "$ip:5555" shell appops write-settings 2>/dev/null || true
+        fi
+    fi
 
     # Apps
     for apk_name in "${!APK_PATHS[@]}"; do
