@@ -56,6 +56,7 @@ jobs:
           name: menu-display-release
           path: addons/menu-display/app/build/outputs/apk/release/app-release.apk
           retention-days: 7
+      - name: Build Sleep Timer APK
         working-directory: addons/sleep-timer
         env:
           KEYSTORE_PATH: /tmp/launcher-release.jks
