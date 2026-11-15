@@ -27,7 +27,7 @@ TV_REGISTRY=(
     "tcl:10.44.0.98:examples/tcl-g03-google-tv"
     "sony75:10.44.0.87:themes/ruska"
     "chromecast-workshop:10.44.0.88:"
-    "sylvox-outdoor:10.44.0.245:"
+    "sylvox-outdoor:10.44.0.245:themes/sylvox-outdoor"
 )
 
 # ── APK registry ───────────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ declare -A ADDON_MAP
 DEBLOAT_MAP["sony65"]="debloat-sony-vh2-uc.txt"
 DEBLOAT_MAP["tcl"]="debloat-tcl-g03.txt"
 DEBLOAT_MAP["sony75"]="debloat-sony-vh2-uc.txt"
-ADDON_MAP["sylvox-outdoor"]="sleep-timer menu-display"
+ADDON_MAP["sylvox-outdoor"]="menu-display"
 # ──────────────────────────────────────────────────────────────────────────────
 FORK=tko76/cleanyourtv
 BRANCH=main
