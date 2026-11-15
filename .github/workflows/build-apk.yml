@@ -40,7 +40,22 @@ jobs:
           name: launcher-release
           path: launcher/app/build/outputs/apk/release/app-release.apk
           retention-days: 7
-      - name: Build Sleep Timer APK
+      - name: Build Menu Display APK
+        working-directory: addons/menu-display
+        env:
+          KEYSTORE_PATH: /tmp/launcher-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+      - name: Upload Menu Display APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: menu-display-release
+          path: addons/menu-display/app/build/outputs/apk/release/app-release.apk
+          retention-days: 7
         working-directory: addons/sleep-timer
         env:
           KEYSTORE_PATH: /tmp/launcher-release.jks

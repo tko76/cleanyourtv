@@ -57,7 +57,7 @@ declare -A ADDON_MAP
 DEBLOAT_MAP["sony65"]="debloat-sony-vh2-uc.txt"
 DEBLOAT_MAP["tcl"]="debloat-tcl-g03.txt"
 DEBLOAT_MAP["sony75"]="debloat-sony-vh2-uc.txt"
-ADDON_MAP["sylvox-outdoor"]="sleep-timer"                    # weekly wake/sleep schedule card
+ADDON_MAP["sylvox-outdoor"]="sleep-timer menu-display"
 # ──────────────────────────────────────────────────────────────────────────────
 FORK=tko76/cleanyourtv
 BRANCH=main
@@ -132,9 +132,10 @@ if [ "$STATUS" != "success" ]; then
 fi
 
 TMPDIR=/tmp/launcher-update-$$
-mkdir -p "$TMPDIR/launcher" "$TMPDIR/addons/sleep-timer"
+mkdir -p "$TMPDIR/launcher" "$TMPDIR/addons/sleep-timer" "$TMPDIR/addons/menu-display"
 gh run download --repo "$FORK" "$RUN_ID" --name launcher-release --dir "$TMPDIR/launcher"
 gh run download --repo "$FORK" "$RUN_ID" --name sleep-timer-release --dir "$TMPDIR/addons/sleep-timer"
+gh run download --repo "$FORK" "$RUN_ID" --name menu-display-release --dir "$TMPDIR/addons/menu-display"
 
 # ── Resolve APK sources ────────────────────────────────────────────────────────
 # Downloads each APK once to TMPDIR; records the local path per registry name.
@@ -255,7 +256,8 @@ install_tv() {
 
     # Per-TV launcher add-ons.
     addon="${ADDON_MAP[$name]+${ADDON_MAP[$name]}}"
-    if [ "$addon" = "sleep-timer" ]; then
+    for addon_name in $addon; do
+    if [ "$addon_name" = "sleep-timer" ]; then
         pkg="io.github.luyzfernando08.sleeptimer"
         svc="$pkg/$pkg.SleepService"
         echo "    [$name] Installing Sleep Timer schedule module..."
@@ -275,6 +277,22 @@ install_tv() {
             adb -s "$ip:5555" shell appops write-settings 2>/dev/null || true
         fi
     fi
+    if [ "$addon_name" = "menu-display" ]; then
+        pkg="io.github.tko76.menudisplay"
+        echo "    [$name] Installing Menu Display..."
+        adb -s "$ip:5555" push "$TMPDIR/addons/menu-display/app-release.apk" /data/local/tmp/menudisplay.apk
+        install_out=$(adb -s "$ip:5555" shell pm install -r /data/local/tmp/menudisplay.apk 2>&1 || true)
+        if echo "$install_out" | grep -q "Success"; then
+            echo "    [$name] Menu Display installed."
+        else
+            echo "    [$name] WARNING: Menu Display update failed: $install_out"
+        fi
+        # Grant file access to USB storage volumes.
+        adb -s "$ip:5555" shell appops set "$pkg" MANAGE_EXTERNAL_STORAGE allow 2>/dev/null || true
+        adb -s "$ip:5555" shell appops set "$pkg" READ_MEDIA_IMAGES allow 2>/dev/null || true
+        adb -s "$ip:5555" shell appops write-settings 2>/dev/null || true
+    fi
+    done
 
     # Apps
     for apk_name in "${!APK_PATHS[@]}"; do
