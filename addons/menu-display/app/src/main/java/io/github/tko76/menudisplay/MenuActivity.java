@@ -21,14 +21,17 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Full-screen image display (or slideshow) loaded from a USB drive.
+ * Full-screen image display (or slideshow) loaded from internal storage or a USB drive.
  *
- * Single image:  name the file display.jpg / display.png / menu.jpg in the USB root.
- * Slideshow:     put multiple jpg/png/webp files in the USB root; they cycle alphabetically.
- *                interval.txt in the root sets seconds-per-slide (default 10).
+ * Source: /sdcard/Menu is tried first (push images there with adb — no USB drive needed);
+ * if that folder is missing or empty, falls back to the root of a removable USB volume.
+ *
+ * Single image:  name the file display.jpg / display.png / menu.jpg in the source folder.
+ * Slideshow:     put multiple jpg/png/webp files in the source folder; they cycle alphabetically.
+ *                interval.txt in the same folder sets seconds-per-slide (default 10).
  *
  * Back or Home returns to the launcher.
- * Update content by swapping files on the drive and power-cycling the TV.
+ * Update content by swapping files in /sdcard/Menu (or on the USB drive) and power-cycling the TV.
  */
 public class MenuActivity extends Activity {
 
@@ -51,17 +54,19 @@ public class MenuActivity extends Activity {
         hideSystemUi();
 
         new Thread(() -> {
-            File usbRoot = findUsbRoot();
-            if (usbRoot == null) {
-                runOnUiThread(() -> toast("No USB drive found — plug in a drive with images."));
+            File source = findSource();
+            if (source == null) {
+                runOnUiThread(() -> toast(
+                    "No images found in /sdcard/Menu or on a USB drive."));
                 return;
             }
 
-            intervalMs = readInterval(usbRoot) * 1000L;
-            images = findImages(usbRoot);
+            intervalMs = readInterval(source) * 1000L;
+            images = findImages(source);
 
             if (images.isEmpty()) {
-                runOnUiThread(() -> toast("No images found on USB drive (jpg/png/webp)."));
+                runOnUiThread(() -> toast(
+                    "No images found in /sdcard/Menu or on a USB drive (jpg/png/webp)."));
                 return;
             }
 
@@ -108,7 +113,23 @@ public class MenuActivity extends Activity {
         }
     }
 
-    // ── USB discovery ────────────────────────────────────────────────────────
+    // ── Source discovery ─────────────────────────────────────────────────────
+
+    /** Internal storage folder tried before any USB drive: /sdcard/Menu. */
+    private static final String INTERNAL_FOLDER_NAME = "Menu";
+
+    /**
+     * Internal /sdcard/Menu first (if it exists and has at least one usable image),
+     * otherwise the root of the first removable USB volume found.
+     */
+    private File findSource() {
+        File internal = new File(android.os.Environment.getExternalStorageDirectory(),
+            INTERNAL_FOLDER_NAME);
+        if (internal.exists() && internal.isDirectory() && !findImages(internal).isEmpty()) {
+            return internal;
+        }
+        return findUsbRoot();
+    }
 
     private File findUsbRoot() {
         StorageManager sm = getSystemService(StorageManager.class);

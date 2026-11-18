@@ -27,8 +27,8 @@ TV_REGISTRY=(
     "tcl:10.44.0.98:examples/tcl-g03-google-tv"
     "sony75:10.44.0.87:themes/ruska"
     "chromecast-workshop:10.44.0.88:"
-    "sylvox-outdoor:10.44.0.245:themes/sylvox-outdoor"
-    "sylvox-indoor:FILL_IN_IP:themes/sylvox-outdoor"
+    "sylvox-outdoor:192.168.12.79:themes/sylvox-outdoor"
+    "sylvox-indoor:192.168.12.188:themes/sylvox-outdoor"
 )
 
 # ── APK registry ───────────────────────────────────────────────────────────────
