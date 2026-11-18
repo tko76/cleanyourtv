@@ -5,6 +5,7 @@ plugins {
 android {
     namespace 'io.github.tko76.menudisplay'
     compileSdk 34
+    buildToolsVersion '35.0.1'
 
     defaultConfig {
         applicationId 'io.github.tko76.menudisplay'
